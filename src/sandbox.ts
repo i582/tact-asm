@@ -145,22 +145,22 @@ async function main() {
 
     const address = contractAddress(0, init)
 
-    // await treasure.send({
-    //     to: address,
-    //     value: toNano("0.1"),
-    //     init,
-    //     body: beginCell().endCell(),
-    //     sendMode: 1,
-    // })
-
-    const provider = blockchain.provider(address, init)
-    const openedContract = provider.open(functions)
-
-    const sendRes = await provider.internal(treasure.getSender(), {
+    await treasure.send({
+        to: address,
         value: toNano("0.1"),
+        init,
         body: beginCell().endCell(),
+        sendMode: 1,
     })
-    console.log(sendRes)
+
+    // const provider = blockchain.provider(address, init)
+    // const openedContract = provider.open(functions)
+    //
+    // const sendRes = await provider.internal(treasure.getSender(), {
+    //     value: toNano("0.1"),
+    //     body: beginCell().endCell(),
+    // })
+    // console.log(sendRes)
 
     // const b = beginCell()
     // storeJettonBurn({
@@ -180,15 +180,15 @@ async function main() {
 
     // console.log(await functions.getData())
     const data = await functions.getGetWalletData()
-    console.log(data)
-    console.log(
-        AssemblyWriter.write(
-            disassembleRoot(data.code, {
-                computeRefs: true,
-            }),
-            {},
-        ),
-    )
+    console.log(data.balance)
+    // console.log(
+    //     AssemblyWriter.write(
+    //         disassembleRoot(data.code, {
+    //             computeRefs: true,
+    //         }),
+    //         {},
+    //     ),
+    // )
 }
 
 void main()

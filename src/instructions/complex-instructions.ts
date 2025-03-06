@@ -142,12 +142,12 @@ export const IFBITJMPREF_BASE = (neg: boolean, num: number, instructions: Instr[
     }
 }
 // IFBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
-export const IFBITJMPREF = (num: number, instructions: Instr[]) =>
-    IFBITJMPREF_BASE(false, num, instructions)
+export const IFBITJMPREF = (bit_idx: number, instructions: Instr[]) =>
+    IFBITJMPREF_BASE(false, bit_idx, instructions)
 
 // IFNBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
-export const IFNBITJMPREF = (num: number, instructions: Instr[]) =>
-    IFBITJMPREF_BASE(true, num, instructions)
+export const IFNBITJMPREF = (bit_idx: number, instructions: Instr[]) =>
+    IFBITJMPREF_BASE(true, bit_idx, instructions)
 // END SECTION
 
 // SECTION: sdbegins
