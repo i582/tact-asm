@@ -1,5 +1,5 @@
-import {Builder, Cell,} from "@ton/core";
-import {Ty} from "./asm1";
+import {Builder, Cell} from "@ton/core"
+import {Ty} from "./asm1"
 
 export type Instr = {
     store: (b: Builder) => void
@@ -9,21 +9,21 @@ export const createSimpleInstr = (prefix: number, prefixLength: number): Instr =
     return {
         store: (b: Builder) => {
             b.storeUint(prefix, prefixLength)
-        }
+        },
     }
 }
 
 export const createUnaryInstr = <T>(
     prefix: number,
     prefixLength: number,
-    serializer: Ty<T>
-): (arg: T) => Instr => {
-    return (arg) => {
+    serializer: Ty<T>,
+): ((arg: T) => Instr) => {
+    return arg => {
         return {
             store: (b: Builder) => {
                 b.storeUint(prefix, prefixLength)
                 serializer.store(arg, b)
-            }
+            },
         }
     }
 }
@@ -32,14 +32,14 @@ export const createFixedRangeInstr = <T>(
     prefix: number,
     prefixLength: number,
     shiftLength: number,
-    serializer: Ty<T>
-): (arg: T) => Instr => {
-    return (arg) => {
+    serializer: Ty<T>,
+): ((arg: T) => Instr) => {
+    return arg => {
         return {
             store: (b: Builder) => {
                 b.storeUint(prefix >> shiftLength, prefixLength)
                 serializer.store(arg, b)
-            }
+            },
         }
     }
 }
@@ -48,15 +48,15 @@ export const createBinaryInstr = <T1, T2>(
     prefix: number,
     prefixLength: number,
     serializer1: Ty<T1>,
-    serializer2: Ty<T2>
-): (arg: T1, arg2: T2) => Instr => {
+    serializer2: Ty<T2>,
+): ((arg: T1, arg2: T2) => Instr) => {
     return (arg, arg2) => {
         return {
             store: (b: Builder) => {
                 b.storeUint(prefix, prefixLength)
                 serializer1.store(arg, b)
                 serializer2.store(arg2, b)
-            }
+            },
         }
     }
 }
@@ -66,8 +66,8 @@ export const createTernaryInstr = <T1, T2, T3>(
     prefixLength: number,
     serializer1: Ty<T1>,
     serializer2: Ty<T2>,
-    serializer3: Ty<T3>
-): (arg: T1, arg2: T2, arg3: T3) => Instr => {
+    serializer3: Ty<T3>,
+): ((arg: T1, arg2: T2, arg3: T3) => Instr) => {
     return (arg, arg2, arg3) => {
         return {
             store: (b: Builder) => {
@@ -75,21 +75,21 @@ export const createTernaryInstr = <T1, T2, T3>(
                 serializer1.store(arg, b)
                 serializer2.store(arg2, b)
                 serializer3.store(arg3, b)
-            }
+            },
         }
     }
 }
 
 export const compile = (instructions: Instr[]): Buffer => {
-    const b = new Builder();
-    instructions.forEach(instruction => instruction.store(b));
+    const b = new Builder()
+    instructions.forEach(instruction => instruction.store(b))
     return b.endCell().toBoc()
 }
 
 export const compileCell = (instructions: Instr[]): Cell => {
-    const b = new Builder();
+    const b = new Builder()
     instructions.forEach(instruction => {
         instruction.store(b)
-    });
+    })
     return b.endCell()
 }

@@ -1,4 +1,4 @@
-import {Cell} from "@ton/core";
+import {Cell} from "@ton/core"
 
 export function visualizeBoc(cell: Cell, name: string) {
     process.stdout.write(name)

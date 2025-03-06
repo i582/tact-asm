@@ -1523,26 +1523,26 @@ const instructions = {
 //     const argTypes = descr.args.tsTypes();
 //     if (descr.kind === "fixed-range") {
 //         if (argTypes.length === 1) {
-//             console.log(`export const ${realRealName} = createFixedRangeInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${descr.skipLen - descr.checkLen}, ${argTypes[0]});`)
+//             console.log(`export const ${realRealName} = createFixedRangeInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${descr.skipLen - descr.checkLen}, ${argTypes[0]})`)
 //             return
 //         }
 //
-//         console.log(`export const ${realRealName} = createFixedRangeInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${descr.skipLen - descr.checkLen}, ${descr.argsString});`)
+//         console.log(`export const ${realRealName} = createFixedRangeInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${descr.skipLen - descr.checkLen}, ${descr.argsString})`)
 //         return
 //     }
 //
 //     if (descr.kind !== "simple") return
 //     if (descr.args !== noArgs) {
 //         if (argTypes.length === 1) {
-//             console.log(`export const ${realRealName} = createUnaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]});`)
+//             console.log(`export const ${realRealName} = createUnaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]})`)
 //             return
 //         }
 //         if (argTypes.length === 2) {
-//             console.log(`export const ${realRealName} = createBinaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]}, ${argTypes[1]});`)
+//             console.log(`export const ${realRealName} = createBinaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]}, ${argTypes[1]})`)
 //             return
 //         }
 //         if (argTypes.length === 3) {
-//             console.log(`export const ${realRealName} = createTernaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]}, ${argTypes[1]}, ${argTypes[2]});`)
+//             console.log(`export const ${realRealName} = createTernaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]}, ${argTypes[1]}, ${argTypes[2]})`)
 //             return
 //         }
 //         return

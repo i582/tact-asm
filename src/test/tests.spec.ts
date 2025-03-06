@@ -1,11 +1,23 @@
-import {compileCell, Instr, BBITS, NEWC, STSLICECONST, THROWANY, THROWARG, SETCP, PUSHINT_LONG, DICTIGETJMPZ, PUSHDICTCONST} from "../instructions";
-import {beginCell, Cell} from "@ton/core";
-import {compileFunc} from "@ton-community/func-js";
+import {
+    compileCell,
+    Instr,
+    BBITS,
+    NEWC,
+    STSLICECONST,
+    THROWANY,
+    THROWARG,
+    SETCP,
+    PUSHINT_LONG,
+    DICTIGETJMPZ,
+    PUSHDICTCONST,
+} from "../instructions"
+import {beginCell, Cell} from "@ton/core"
+import {compileFunc} from "@ton-community/func-js"
 
 interface TestCase {
-    readonly name: string,
-    readonly instructions: Instr[],
-    readonly funcCode: string,
+    readonly name: string
+    readonly instructions: Instr[]
+    readonly funcCode: string
 }
 
 const TESTS: TestCase[] = [
@@ -13,22 +25,25 @@ const TESTS: TestCase[] = [
         name: "STSLICECONST",
         instructions: [
             SETCP(0),
-            PUSHDICTCONST(new Map([
-                [0, [
-                    NEWC(),
-                    STSLICECONST(beginCell().storeUint(0b0, 1).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 2).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 3).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 4).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 5).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 6).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 7).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 8).asSlice()),
-                    STSLICECONST(beginCell().storeUint(0b0, 9).asSlice()),
-                    BBITS(),
-                    THROWANY(),
-                ]],
-            ])),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        NEWC(),
+                        STSLICECONST(beginCell().storeUint(0b0, 1).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 2).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 3).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 4).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 5).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 6).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 7).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 8).asSlice()),
+                        STSLICECONST(beginCell().storeUint(0b0, 9).asSlice()),
+                        BBITS(),
+                        THROWANY(),
+                    ]],
+                ]),
+            ),
             DICTIGETJMPZ(),
             THROWARG(11),
         ],
@@ -58,50 +73,45 @@ const TESTS: TestCase[] = [
                     .store_slice8()
                     .store_slice9()
                     .builder_bits());
-            }`
+            }`,
     },
 
     {
         name: "PUSHINT_LONG",
         instructions: [
             SETCP(0),
-            PUSHDICTCONST(new Map([
-                [0, [
-                    PUSHINT_LONG(99999999999999999n),
-                    THROWANY(),
-                ]],
-            ])),
+            PUSHDICTCONST(new Map([[0, [PUSHINT_LONG(99999999999999999n), THROWANY()]]])),
             DICTIGETJMPZ(),
             THROWARG(11),
         ],
         funcCode: `
             () recv_internal() impure {
                 throw(99999999999999999);
-            }`
-    }
+            }`,
+    },
 ]
 
-describe('tests', () => {
+describe("tests", () => {
     TESTS.forEach(({name, instructions, funcCode}: TestCase) => {
         it(`Test ${name}`, async () => {
             const compiled = compileCell(instructions)
             const funcCompiled = await compile(funcCode)
 
-            const actual = compiled.toString();
-            const expected = funcCompiled.toString();
+            const actual = compiled.toString()
+            const expected = funcCompiled.toString()
             expect(actual).toEqual(expected)
         })
-    });
-});
+    })
+})
 
 const compile = async (code: string): Promise<Cell> => {
     const res = await compileFunc({
         sources: [
             {
                 content: code,
-                filename: "source"
-            }
-        ]
+                filename: "source",
+            },
+        ],
     })
     if (res.status === "error") {
         throw new Error("cannot compile FunC")

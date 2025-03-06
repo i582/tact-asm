@@ -1,13 +1,12 @@
-import {compileCell, Instr} from "./instr";
-import {beginCell, Builder, Cell, Dictionary, DictionaryValue, Slice} from "@ton/core";
-import {largeInt} from "./asm1";
+import {compileCell, Instr} from "./instr"
+import {beginCell, Builder, Cell, Dictionary, DictionaryValue, Slice} from "@ton/core"
+import {largeInt} from "./asm1"
 
-export type EPS = Instr;
+export type EPS = Instr
 
 export const EPS = (): EPS => {
     return {
-        store: (_: Builder) => {
-        }
+        store: (_: Builder) => {},
     }
 }
 
@@ -16,7 +15,7 @@ export const THROW = (arg: bigint): Instr => {
         store: (b: Builder) => {
             b.storeUint(0xf20 | (Number(arg) >> 4), 12)
             b.storeUint(Number(arg) & 15, 4)
-        }
+        },
     }
 }
 
@@ -24,7 +23,7 @@ export const XCHG_0 = (arg: number) => {
     return {
         store: (b: Builder) => {
             b.storeUint(0x02 | (arg & 15), 8)
-        }
+        },
     }
 }
 
@@ -46,23 +45,20 @@ export const PUSHDICTCONST = (mapping: Map<number, Instr[]>): Instr => {
 
     return {
         store: (b: Builder) => {
-            const dict = Dictionary.empty<number, Cell>(
-                Dictionary.Keys.Int(19),
-                createCodeCell(),
-            )
-            mapping.entries().forEach((entry) => {
+            const dict = Dictionary.empty<number, Cell>(Dictionary.Keys.Int(19), createCodeCell())
+            mapping.entries().forEach(entry => {
                 const [id, instructions] = entry
                 const cell = compileCell(instructions)
                 dict.set(id, cell)
             })
 
-            b.storeUint(0xF4A400 >> 11, 13) // 0b1111010010100110
+            b.storeUint(0xf4a400 >> 11, 13) // 0b1111010010100110
             b.storeUint(1, 1)
 
             b.storeRef(beginCell().storeDictDirect(dict).endCell())
 
             b.storeUint(19, 10)
-        }
+        },
     }
 }
 
@@ -85,7 +81,7 @@ export const PUSHCONT = (instructions: Instr[]) => {
             const cell = compileCell(instructions)
 
             b.storeRef(cell)
-        }
+        },
     }
 }
 
@@ -100,7 +96,7 @@ export const CALLREF = (instructions: Instr[]) => {
 
             const cell = compileCell(instructions)
             b.storeRef(cell)
-        }
+        },
     }
 }
 
@@ -115,7 +111,7 @@ export const IFREFELSE = (instructions: Instr[]) => {
 
             const cell = compileCell(instructions)
             b.storeRef(cell)
-        }
+        },
     }
 }
 
@@ -130,7 +126,7 @@ export const IFJMPREF = (instructions: Instr[]) => {
 
             const cell = compileCell(instructions)
             b.storeRef(cell)
-        }
+        },
     }
 }
 
@@ -145,7 +141,7 @@ export const PUSHREF = (instructions: Instr[]) => {
 
             const cell = compileCell(instructions)
             b.storeRef(cell)
-        }
+        },
     }
 }
 
@@ -163,7 +159,7 @@ export const PUSHINT_LONG = (val: bigint) => {
         store: (b: Builder) => {
             b.storeUint(0x82, 8)
             largeInt.store(val, b)
-        }
+        },
     }
 }
 
@@ -183,8 +179,7 @@ export const STSLICECONST = (slice: Slice) => {
         store: (b: Builder) => {
             // 0xCFC0_ 6_
 
-            b.storeUint(0xCF80 >> 7, 9)
-
+            b.storeUint(0xcf80 >> 7, 9)
 
             // 11010011110010001100111110001 000010000000000 1000 11001111001100011111001011110000
             // 11010011110010001100111110001 000010000000000 0000 11001111001100011111001011110000
@@ -232,6 +227,6 @@ export const STSLICECONST = (slice: Slice) => {
             if (realLength - length > 0) {
                 b.storeUint(0x0, realLength - length)
             }
-        }
+        },
     }
 }
