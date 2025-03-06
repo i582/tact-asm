@@ -9,15 +9,18 @@ import {
     PUSHINT,
     ADD,
     IFNBITJMPREF,
+    MUL,
 } from "../instructions"
 import {AssemblyWriter, disassembleRoot} from "@tact-lang/opcode"
-import {call} from "../instructions/helpers"
+import {call, execute} from "../instructions/helpers"
 
 interface TestCase {
     readonly name: string
     readonly instructions: Instr[]
     readonly expected: string
 }
+
+const someFunction = (): Instr[] => [MUL(), ADD()]
 
 const TESTS: TestCase[] = [
     {
@@ -105,6 +108,37 @@ PROGRAM{
     1 PUSHINT
     2 PUSHINT
     ADD
+  }>
+}END>c`,
+    },
+
+    {
+        name: "execute",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        execute(someFunction, PUSHINT(1), PUSHINT(2), PUSHINT(3))
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        expected: `"Asm.fif" include
+PROGRAM{
+  DECLPROC recv_internal
+  recv_internal PROC:<{
+    1 PUSHINT
+    2 PUSHINT
+    3 PUSHINT
+    <{
+      MUL
+      ADD
+    }> PUSHCONT
+    EXECUTE
   }>
 }END>c`,
     },

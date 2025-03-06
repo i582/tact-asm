@@ -1,4 +1,4 @@
-import {beginCell, Cell} from "@ton/core"
+import {beginCell, Builder, Cell} from "@ton/core"
 import {AssemblyWriter, disassembleRoot} from "@tact-lang/opcode"
 import {
     BBITS,
@@ -10,8 +10,14 @@ import {
     PUSHDICTCONST,
     STSLICECONST,
     compileCell,
+    Instr,
+    PUSHINT,
+    ADD,
+    PUSHCONT,
+    EXECUTE,
 } from "./instructions"
 import {visualizeBoc} from "./utils/debug"
+import {execute} from "./instructions/helpers"
 
 const instructions = [
     SETCP(0),
@@ -19,20 +25,7 @@ const instructions = [
         new Map([
             // prettier-ignore
             [0, [
-                NEWC(),
-                // STSLICECONST(beginCell().storeBits(new BitString(Buffer.from("1000", "hex"), 0, 14)).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 1).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 2).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 3).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 4).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 5).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 6).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 7).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 8).asSlice()),
-                STSLICECONST(beginCell().storeUint(0b0, 9).asSlice()),
-                BBITS(),
 
-                THROWANY(),
             ]],
         ]),
     ),

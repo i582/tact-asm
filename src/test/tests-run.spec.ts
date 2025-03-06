@@ -1,14 +1,19 @@
 import {
+    ADD,
     compileCell,
     DICTIGETJMPZ,
     DROP,
+    EXECUTE,
     IFBITJMPREF,
     IFNBITJMPREF,
     Instr,
+    MUL,
+    PUSHCONT_SHORT,
     PUSHDICTCONST,
     PUSHINT,
     PUSHINT_16,
     PUSHINT_8,
+    PUSHREF,
     SETCP,
     THROWARG,
 } from "../instructions"
@@ -27,6 +32,7 @@ import {
 } from "@ton/core"
 import {Blockchain, SandboxContract, TreasuryContract} from "@ton/sandbox"
 import {Maybe} from "@ton/core/dist/utils/maybe"
+import {execute} from "../instructions/helpers"
 
 interface TestCase {
     readonly name: string
@@ -36,6 +42,8 @@ interface TestCase {
 }
 
 const emptyData = () => beginCell().endCell()
+
+const someFunction = (): Instr[] => [MUL(), ADD()]
 
 const TESTS: TestCase[] = [
     {
@@ -90,6 +98,28 @@ const TESTS: TestCase[] = [
         compareResult: (res: TupleReader) => {
             const num = res.readBigNumber()
             expect(Number(num)).toEqual(999)
+        },
+    },
+
+    {
+        name: "execute",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        execute(someFunction, PUSHINT(1), PUSHINT(2), PUSHINT(3))
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        prepareData: emptyData,
+        compareResult: (res: TupleReader) => {
+            const num = res.readBigNumber()
+            expect(Number(num)).toEqual(7)
         },
     },
 ]
