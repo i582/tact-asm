@@ -1,10 +1,6 @@
-import assert from 'assert';
-import { Builder, Cell, Slice } from "@ton/core";
-import * as S from "./cell-schema";
+import {BitReader, Builder, Slice} from "@ton/core";
 import * as $ from "@tonstudio/parser-runtime";
-import { entries, enumObject } from "./tricks";
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { entries, enumObject } from "../utils/tricks";
 
 export type Ty<T> = {
     baseLen: number;
@@ -24,6 +20,16 @@ const noArgs: Ty<[]> = {
     parse: $.app($.str(''), () => []),
     tsTypes: () => [''],
     print: () => '',
+};
+
+export const getPreload = <T>(f: (s: Slice) => T) => (s: Slice) => {
+    const priv = s as unknown as { _reader: BitReader };
+    try {
+        priv._reader.save();
+        return f(s);
+    } finally {
+        priv._reader.reset();
+    }
 };
 
 const unsignedNumber = $.lex($.stry($.plus($.regex<string>("0-9", [$.ExpRange("0", "9")]))));
@@ -202,7 +208,7 @@ export const slice = (bits: Ty<number>, pad: number): Ty<Buffer> => {
             b.storeUint(0, pad);
         },
         load,
-        preload: S.getPreload(load),
+        preload: getPreload(load),
         baseLen: bits.baseLen,
         parse: $.app(sliceLiteral, s => {
             if (s.length >= (1 << bits.baseLen)) {
@@ -233,7 +239,7 @@ export const seq2 = <T, U>(t1: Ty<T>, t2: Ty<U>): Ty<[T, U]> => {
             t2.store(u, b);
         },
         load,
-        preload: S.getPreload(load),
+        preload: getPreload(load),
         baseLen: t1.baseLen + t2.baseLen,
         parse: $.seq(t1.parse, t2.parse),
         print: ([t, u]) => t1.print(t) + ' ' + t2.print(u),
@@ -250,7 +256,7 @@ export const seq3 = <T, U, V>(t1: Ty<T>, t2: Ty<U>, t3: Ty<V>): Ty<[T, U, V]> =>
             t3.store(v, b);
         },
         load,
-        preload: S.getPreload(load),
+        preload: getPreload(load),
         baseLen: t1.baseLen + t2.baseLen + t3.baseLen,
         parse: $.app(
             $.seq($.seq(t1.parse, t2.parse), t3.parse),
@@ -305,7 +311,7 @@ export const largeInt: Ty<bigint> = ({
         b.storeInt(t, intCountBits);
     },
     load: loadLargeInt,
-    preload: S.getPreload(loadLargeInt),
+    preload: getPreload(loadLargeInt),
     baseLen: uint5.baseLen,
     parse: $.app(signedNumber, ([p, s]) => {
         const n = BigInt((p ?? '') + s);
@@ -1442,14 +1448,14 @@ const instructions = {
     THROWIFNOT: cat('exception', mkfixedn(0xf28 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 2)`)),
     THROWIFNOT_1: cat('exception', mkfixedn(0xf2e0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 2)`)),
 
-    PUSHINT: cat('int_const', mkfixedn(0x7, 4, 4, seq1(tinyInt), "seq1(tinyInt)", `exec_push_tinyint4`)),
-    PUSHINT_1: cat('int_const', mkfixedn(0x81, 8, 16, seq1(int(16)), "seq1(int(16))", `exec_push_smallint`)),
-    PUSHINT_2: cat('int_const', mkfixedn(0x80, 8, 8, seq1(int(8)), "seq1(int(8))", `exec_push_tinyint8`)),
-    PUSHINT_3: cat('int_const', mkextrange(0, 0x820 << 1, (0x820 << 1) + 31, 13, 5, largeInt, `exec_push_int`)),
+    PUSHINT_4: cat('int_const', mkfixedn(0x7, 4, 4, seq1(tinyInt), "seq1(tinyInt)", `exec_push_tinyint4`)),
+    PUSHINT_8: cat('int_const', mkfixedn(0x80, 8, 8, seq1(int(8)), "seq1(int(8))", `exec_push_tinyint8`)),
+    PUSHINT_16: cat('int_const', mkfixedn(0x81, 8, 16, seq1(int(16)), "seq1(int(16))", `exec_push_smallint`)),
+    PUSHINT_LONG: cat('int_const', mkextrange(0, 0x820 << 1, (0x820 << 1) + 31, 13, 5, largeInt, `exec_push_int`)),
 
     XCHG: cat('stack', mkfixedn(0x11, 8, 8, stack(8), "stack(8)", `exec_xchg0_l`)),
+    XCHG_0: cat('stack', mkfixedrangen(0x02, 0x10, 8, 4, seq1(stack(4)), "seq1(stack(4))", `exec_xchg0`)),
     XCHG_1: cat('stack', mkfixedn(0x10, 8, 8, xchgArgs, "xchgArgs", `exec_xchg`)),
-    XCHG_2: cat('stack', mkfixedrangen(0x02, 0x10, 8, 4, seq1(stack(4)), "seq1(stack(4))", `exec_xchg0`)),
     XCHG_3: cat('stack', mkfixedrangen(0x12, 0x20, 8, 4, seq2(s1, stack(4)), "seq2(s1, stack(4))", `exec_xchg1`)),
 
     // special case: opcode with holes

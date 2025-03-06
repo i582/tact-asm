@@ -1,11 +1,10 @@
-import * as i from "./instr-gen";
-import {DICTIGETJMPZ, PUSHDICTCONST} from "./instr";
+import * as i from "../src/instructions";
 import {beginCell, BitString} from "@ton/core";
-import {Hash} from "./asm1";
+import {Hash} from "../src/instructions/asm1";
 
 export const instructions = [
   i.SETCP(0),
-  PUSHDICTCONST(new Map([
+  i.PUSHDICTCONST(new Map([
     [0, [
       i.POP(0),                                   // 0x3 0
       i.PUSHREF([
@@ -621,5 +620,5 @@ export const instructions = [
       i.BLKDROP2([3 , 4]),                        // 0x6C 3 4
     ]],
   ])),
-  DICTIGETJMPZ(),
+  i.DICTIGETJMPZ(),
 ];

@@ -1,5 +1,4 @@
-import * as i from "./instr-gen";
-import {DICTIGETJMPZ, PUSHDICTCONST} from "./instr";
+import * as i from "../src/instructions";
 
 export const instructions = [
   i.SETCP(0),
@@ -106,7 +105,7 @@ export const instructions = [
       ]),
   ]),
   i.IFNOTJMP(),
-  PUSHDICTCONST(new Map([
+  i.PUSHDICTCONST(new Map([
     [104984, [
       i.PUSHCTR(4),                               // 0xED4 4
       i.CTOS(),                                   // 0xD0
@@ -158,5 +157,5 @@ export const instructions = [
       i.BLKDROP2([2 , 1]),                        // 0x6C 2 1
     ]],
   ])),
-  DICTIGETJMPZ(),
+  i.DICTIGETJMPZ(),
 ];

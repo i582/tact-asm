@@ -1,6 +1,5 @@
 import {compileFunc} from "@ton-community/func-js";
 
-
 compileFunc({
     sources: [
         {

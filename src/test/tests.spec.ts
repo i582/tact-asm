@@ -1,5 +1,4 @@
-import {compileCell, DICTIGETJMPZ, Instr, PUSHDICTCONST} from "./instr";
-import {BBITS, NEWC, STSLICECONST, THROWANY, THROWARG, SETCP} from "./instr-gen";
+import {compileCell, Instr, BBITS, NEWC, STSLICECONST, THROWANY, THROWARG, SETCP, PUSHINT_LONG, DICTIGETJMPZ, PUSHDICTCONST} from "../instructions";
 import {beginCell, Cell} from "@ton/core";
 import {compileFunc} from "@ton-community/func-js";
 
@@ -59,6 +58,25 @@ const TESTS: TestCase[] = [
                     .store_slice8()
                     .store_slice9()
                     .builder_bits());
+            }`
+    },
+
+    {
+        name: "PUSHINT_LONG",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(new Map([
+                [0, [
+                    PUSHINT_LONG(99999999999999999n),
+                    THROWANY(),
+                ]],
+            ])),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        funcCode: `
+            () recv_internal() impure {
+                throw(99999999999999999);
             }`
     }
 ]
