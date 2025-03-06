@@ -1,4 +1,4 @@
-import {compileCell, Instr} from "./instr"
+import {compileCell, createRefInstr, Instr} from "./instr"
 import {beginCell, Builder, Cell, Dictionary, DictionaryValue, Slice} from "@ton/core"
 import {largeInt} from "./asm1"
 
@@ -10,11 +10,11 @@ export const EPS = (): EPS => {
     }
 }
 
-export const THROW = (arg: bigint): Instr => {
+export const THROW_SMALL = (arg: number): Instr => {
     return {
         store: (b: Builder) => {
-            b.storeUint(0xf20 | (Number(arg) >> 4), 12)
-            b.storeUint(Number(arg) & 15, 4)
+            b.storeUint(0xf20 | (arg >> 4), 12)
+            b.storeUint(arg & 15, 4)
         },
     }
 }
@@ -85,65 +85,51 @@ export const PUSHCONT = (instructions: Instr[]) => {
     }
 }
 
-export const CALLREF = (instructions: Instr[]) => {
+export const PUSHCONT_SHORT = (instructions: Instr[]) => {
     return {
-        // DB3C
+        // 9xccc
         //
-        // CALLREF: cat('continuation_jump', mkext(1, 0xdb3c, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_do_with_ref(_1, _2, _4, (st, cont) => st.call((cont)), 'CALLREF')`)),
+        // PUSHCONT_4: cat('cell_const', mkext(0, 0x9, 4, 4, slice(uint(4), 0), `exec_push_cont_simple`)),
 
         store: (b: Builder) => {
-            b.storeUint(0xdb3c, 16)
+            b.storeUint(0x9, 4)
 
             const cell = compileCell(instructions)
-            b.storeRef(cell)
+
+            const length = cell.bits.length
+            const x = Math.ceil(length / 8)
+
+            b.storeUint(x, 4) // x
+
+            b.storeSlice(cell.asSlice())
         },
     }
 }
 
-export const IFREFELSE = (instructions: Instr[]) => {
+// SECTION: Ref instructions
+export const PUSHREF = createRefInstr(0x88, 8)
+export const PUSHREFSLICE = createRefInstr(0x89, 8)
+export const PUSHREFCONT = createRefInstr(0x8a, 8)
+export const CALLREF = createRefInstr(0xdb3c, 16)
+export const JMPREF = createRefInstr(0xdb3d, 16)
+export const JMPREFDATA = createRefInstr(0xdb3e, 16)
+export const IFREF = createRefInstr(0xe300, 16)
+export const IFNOTREF = createRefInstr(0xe301, 16)
+export const IFJMPREF = createRefInstr(0xe302, 16)
+export const IFNOTJMPREF = createRefInstr(0xe303, 16)
+export const IFREFELSE = createRefInstr(0xe30d, 16)
+export const IFELSEREF = createRefInstr(0xe30e, 16)
+
+export const IFREFELSEREF = (trueBranch: Instr[], falseBranch: Instr[]): Instr => {
     return {
-        // E30D
-        //
-        // IFREFELSE: cat('continuation_cond_loop', mkext(1, 0xe30d, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_ifelse_ref(_1, _2, _4, true)`)),
-
         store: (b: Builder) => {
-            b.storeUint(0xe30d, 16)
-
-            const cell = compileCell(instructions)
-            b.storeRef(cell)
+            b.storeUint(0xe30f, 16)
+            b.storeRef(compileCell(trueBranch))
+            b.storeRef(compileCell(falseBranch))
         },
     }
 }
-
-export const IFJMPREF = (instructions: Instr[]) => {
-    return {
-        // E302
-        //
-        // IFJMPREF: cat('continuation_cond_loop', mkext(1, 0xe302, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_do_with_cell(1, _2, _4, (st, cell) => st.get_stack().pop_bool() ? st.jump(st.ref_to_cont((cell))) : 0, 'IFJMPREF')`)),
-
-        store: (b: Builder) => {
-            b.storeUint(0xe302, 16)
-
-            const cell = compileCell(instructions)
-            b.storeRef(cell)
-        },
-    }
-}
-
-export const PUSHREF = (instructions: Instr[]) => {
-    return {
-        // 88
-        //
-        // PUSHREF: cat('cell_const', mkext(1, 0x88, 8, 0, noArgs, `(_1, _2, _3, _4) => exec_push_ref(_1, _2, 0, _4)`)),
-
-        store: (b: Builder) => {
-            b.storeUint(0x88, 8)
-
-            const cell = compileCell(instructions)
-            b.storeRef(cell)
-        },
-    }
-}
+// END SECTION
 
 export const PUSHINT_LONG = (val: bigint) => {
     return {

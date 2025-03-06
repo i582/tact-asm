@@ -10,9 +10,13 @@ import {
     PUSHINT_LONG,
     DICTIGETJMPZ,
     PUSHDICTCONST,
+    IFELSE,
+    PUSHCONT_SHORT,
+    THROW_SMALL,
 } from "../instructions"
 import {beginCell, Cell} from "@ton/core"
 import {compileFunc} from "@ton-community/func-js"
+import {AssemblyWriter, disassembleRoot} from "@tact-lang/opcode"
 
 interface TestCase {
     readonly name: string
@@ -80,13 +84,50 @@ const TESTS: TestCase[] = [
         name: "PUSHINT_LONG",
         instructions: [
             SETCP(0),
-            PUSHDICTCONST(new Map([[0, [PUSHINT_LONG(99999999999999999n), THROWANY()]]])),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                    PUSHINT_LONG(99999999999999999n), THROWANY()
+                ]
+            ],
+                ]),
+            ),
             DICTIGETJMPZ(),
             THROWARG(11),
         ],
         funcCode: `
             () recv_internal() impure {
                 throw(99999999999999999);
+            }`,
+    },
+
+    {
+        name: "IF-ELSE",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                // prettier-ignore
+                new Map([[0, [
+                    PUSHCONT_SHORT([
+                        THROW_SMALL(1),
+                    ]),
+                    PUSHCONT_SHORT([
+                        THROW_SMALL(2),
+                    ]),
+                    IFELSE(),
+                ]]]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        funcCode: `
+            () recv_internal(int cond) impure {
+                if (cond) {
+                    throw(1);
+                } else {
+                    throw(2);
+                }
             }`,
     },
 ]
@@ -98,13 +139,25 @@ describe("tests", () => {
             const funcCompiled = await compile(funcCode)
 
             const actual = compiled.toString()
-            const expected = funcCompiled.toString()
+            const expected = funcCompiled[0].toString()
+
+            if (actual !== expected) {
+                const fift = funcCompiled[1]
+                console.log(fift)
+
+                const disasn = disassembleRoot(funcCompiled[0], {computeRefs: false})
+                console.log(AssemblyWriter.write(disasn, {outputBitcodeAfterInstruction: true}))
+
+                const disasn2 = disassembleRoot(compiled, {computeRefs: false})
+                console.log(AssemblyWriter.write(disasn2, {outputBitcodeAfterInstruction: true}))
+            }
+
             expect(actual).toEqual(expected)
         })
     })
 })
 
-const compile = async (code: string): Promise<Cell> => {
+const compile = async (code: string): Promise<[Cell, string]> => {
     const res = await compileFunc({
         sources: [
             {
@@ -117,5 +170,5 @@ const compile = async (code: string): Promise<Cell> => {
         throw new Error("cannot compile FunC")
     }
 
-    return Cell.fromBase64(res.codeBoc)
+    return [Cell.fromBase64(res.codeBoc), res.fiftCode]
 }

@@ -80,6 +80,20 @@ export const createTernaryInstr = <T1, T2, T3>(
     }
 }
 
+export const createRefInstr = (
+    prefix: number,
+    prefixLength: number,
+): ((instructions: Instr[]) => Instr) => {
+    return instructions => {
+        return {
+            store: (b: Builder) => {
+                b.storeUint(prefix, prefixLength)
+                b.storeRef(compileCell(instructions))
+            },
+        }
+    }
+}
+
 export const compile = (instructions: Instr[]): Buffer => {
     const b = new Builder()
     instructions.forEach(instruction => instruction.store(b))

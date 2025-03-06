@@ -1312,6 +1312,7 @@ const instructions = {
     SETGLOB: cat('config', mkfixedrangen(0xf861, 0xf880, 16, 5, seq1(uint(5)), "seq1(uint(5))", `exec_set_global`)),
     GETPARAM: cat('config', mkfixedrangen(0xf820, 0xf823, 16, 4, seq1(uint(4)), "seq1(uint(4))", `exec_get_var_param`)),
 
+    // SECTION: Ref instructions
     PUSHREF: cat('cell_const', mkext(1, 0x88, 8, 0, noArgs, `(_1, _2, _3, _4) => exec_push_ref(_1, _2, 0, _4)`)),
     PUSHREFSLICE: cat('cell_const', mkext(1, 0x89, 8, 0, noArgs, `(_1, _2, _3, _4) => exec_push_ref(_1, _2, 1, _4)`)),
     PUSHREFCONT: cat('cell_const', mkext(1, 0x8a, 8, 0, noArgs, `(_1, _2, _3, _4) => exec_push_ref(_1, _2, 2, _4)`)),
@@ -1325,6 +1326,7 @@ const instructions = {
     IFREFELSE: cat('continuation_cond_loop', mkext(1, 0xe30d, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_ifelse_ref(_1, _2, _4, true)`)),
     IFELSEREF: cat('continuation_cond_loop', mkext(1, 0xe30e, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_ifelse_ref(_1, _2, _4, false)`)),
     IFREFELSEREF: cat('continuation_cond_loop', mkext(2, 0xe30f, 16, 0, noArgs, `exec_ifref_elseref`)),
+    // END SECTION
 
     DICTPUSHCONST: cat('dictionary', mkextrange(1, 0xf4a400, 0xf4a800, 24, 11, seq2(uint(1), uint(10)), `exec_push_const_dict`)),
     PFXDICTSWITCH: cat('dictionary', mkextrange(1, 0xf4ac00, 0xf4b000, 24, 11, seq2(uint(1), uint(10)), `exec_const_pfx_dict_switch`)),
@@ -1441,7 +1443,7 @@ const instructions = {
     // special case: long and short versions
     CALLDICT: cat('continuation_dict_jump', mkfixedn(0xf0, 8, 8, seq1(uint(8)), "seq1(uint(8))", `exec_calldict_short`)),
     CALLDICT_1: cat('continuation_dict_jump', mkfixedn(0xf10 >> 2, 10, 14, seq1(uint(14)), "seq1(uint(14))", `exec_calldict`)),
-    THROW: cat('exception', mkfixedn(0xf20 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 0)`)),
+    THROW_SMALL: cat('exception', mkfixedn(0xf20 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 0)`)),
     THROW_1: cat('exception', mkfixedn(0xf2c0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 0)`)),
     THROWIF: cat('exception', mkfixedn(0xf24 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 3)`)),
     THROWIF_1: cat('exception', mkfixedn(0xf2d0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 3)`)),
@@ -1500,7 +1502,7 @@ const instructions = {
     PUSHCONT_1: cat('cell_const', mkext(1, 0x8e8 >> 3, 9, 7, slice(uint(7), 0), `exec_push_cont`)),
     PUSHCONT_2: cat('cell_const', mkext(2, 0x8f0 >> 3, 9, 7, slice(uint(7), 0), `exec_push_cont`)),
     PUSHCONT_3: cat('cell_const', mkext(3, 0x8f8 >> 3, 9, 7, slice(uint(7), 0), `exec_push_cont`)),
-    PUSHCONT_4: cat('cell_const', mkext(0, 0x9, 4, 4, slice(uint(4), 0), `exec_push_cont_simple`)),
+    PUSHCONT_SHORT: cat('cell_const', mkext(0, 0x9, 4, 4, slice(uint(4), 0), `exec_push_cont_simple`)),
 
     STSLICECONST: cat('cell_serialize', mkext(0, 0xcf8 >> 1, 11, 3, slice(uint(3), 2), `exec_store_const_slice`)),
     STSLICECONST_2: cat('cell_serialize', mkext(1, 0xcfa >> 1, 11, 3, slice(uint(3), 2), `exec_store_const_slice`)),
