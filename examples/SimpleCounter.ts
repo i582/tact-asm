@@ -101,7 +101,7 @@ export const instructions = [
               i.POPCTR(4),                              // 0xED5 4
           ]),                                         // 0xE302 01C87F01CA005902CB1FCB1FC9ED54
           i.DROP2(),                                  // 0x5B
-          i.THROW_1(130),                               // 0xF2C4_ 105_
+          i.THROW(130),                               // 0xF2C4_ 105_
       ]),
   ]),
   i.IFNOTJMP(),

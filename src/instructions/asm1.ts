@@ -1,6 +1,8 @@
 import {BitReader, Builder, Slice} from "@ton/core";
 import * as $ from "@tonstudio/parser-runtime";
 import { entries, enumObject } from "../utils/tricks";
+import {THROW_SHORT} from "./complex-instructions"
+import {THROWIFNOT_SHORT, XCHG_LONG} from "./instr-gen"
 
 export type Ty<T> = {
     baseLen: number;
@@ -1444,20 +1446,20 @@ const instructions = {
 
     // special case: long and short versions
     CALLDICT: cat('continuation_dict_jump', mkfixedn(0xf0, 8, 8, seq1(uint(8)), "seq1(uint(8))", `exec_calldict_short`)),
-    CALLDICT_1: cat('continuation_dict_jump', mkfixedn(0xf10 >> 2, 10, 14, seq1(uint(14)), "seq1(uint(14))", `exec_calldict`)),
-    THROW_SMALL: cat('exception', mkfixedn(0xf20 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 0)`)),
-    THROW_1: cat('exception', mkfixedn(0xf2c0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 0)`)),
-    THROWIF: cat('exception', mkfixedn(0xf24 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 3)`)),
-    THROWIF_1: cat('exception', mkfixedn(0xf2d0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 3)`)),
-    THROWIFNOT: cat('exception', mkfixedn(0xf28 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 2)`)),
-    THROWIFNOT_1: cat('exception', mkfixedn(0xf2e0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 2)`)),
+    CALLDICT_LONG: cat('continuation_dict_jump', mkfixedn(0xf10 >> 2, 10, 14, seq1(uint(14)), "seq1(uint(14))", `exec_calldict`)),
+    THROW_SHORT: cat('exception', mkfixedn(0xf20 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 0)`)),
+    THROW: cat('exception', mkfixedn(0xf2c0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 0)`)),
+    THROWIF_SHORT: cat('exception', mkfixedn(0xf24 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 3)`)),
+    THROWIF: cat('exception', mkfixedn(0xf2d0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 3)`)),
+    THROWIFNOT_SHORT: cat('exception', mkfixedn(0xf28 >> 2, 10, 6, seq1(uint(6)), "seq1(uint(6))", `exec_throw_fixed(_1, _2, 63, 2)`)),
+    THROWIFNOT: cat('exception', mkfixedn(0xf2e0 >> 3, 13, 11, seq1(uint(11)), "seq1(uint(11))", `exec_throw_fixed(_1, _2, 0x7ff, 2)`)),
 
-    PUSHINT_4: cat('int_const', mkfixedn(0x7, 4, 4, seq1(tinyInt), "seq1(tinyInt)", `exec_push_tinyint4`)),
+    PUSHINT: cat('int_const', mkfixedn(0x7, 4, 4, seq1(tinyInt), "seq1(tinyInt)", `exec_push_tinyint4`)),
     PUSHINT_8: cat('int_const', mkfixedn(0x80, 8, 8, seq1(int(8)), "seq1(int(8))", `exec_push_tinyint8`)),
     PUSHINT_16: cat('int_const', mkfixedn(0x81, 8, 16, seq1(int(16)), "seq1(int(16))", `exec_push_smallint`)),
     PUSHINT_LONG: cat('int_const', mkextrange(0, 0x820 << 1, (0x820 << 1) + 31, 13, 5, largeInt, `exec_push_int`)),
 
-    XCHG: cat('stack', mkfixedn(0x11, 8, 8, stack(8), "stack(8)", `exec_xchg0_l`)),
+    XCHG_LONG: cat('stack', mkfixedn(0x11, 8, 8, stack(8), "stack(8)", `exec_xchg0_l`)),
     XCHG_0: cat('stack', mkfixedrangen(0x02, 0x10, 8, 4, seq1(stack(4)), "seq1(stack(4))", `exec_xchg0`)),
     XCHG_1: cat('stack', mkfixedn(0x10, 8, 8, xchgArgs, "xchgArgs", `exec_xchg`)),
     XCHG_3: cat('stack', mkfixedrangen(0x12, 0x20, 8, 4, seq2(s1, stack(4)), "seq2(s1, stack(4))", `exec_xchg1`)),
@@ -1552,7 +1554,7 @@ const instructions = {
 //         }
 //         return
 //     }
-//     console.log(`export const ${realRealName} = () => createSimpleInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen});`)
+//     console.log(`export const ${realRealName} = () => createSimpleInstr("${name}", 0x${descr.prefix.toString(16)}, ${descr.checkLen});`)
 // })
 
 

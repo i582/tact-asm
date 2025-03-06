@@ -12,7 +12,7 @@ import {
     PUSHDICTCONST,
     IFELSE,
     PUSHCONT_SHORT,
-    THROW_SMALL,
+    THROW_SHORT,
     SDBEGINSX,
     SBITS,
     SDBEGINS,
@@ -113,10 +113,10 @@ const TESTS: TestCase[] = [
                 // prettier-ignore
                 new Map([[0, [
                     PUSHCONT_SHORT([
-                        THROW_SMALL(1),
+                        THROW_SHORT(1),
                     ]),
                     PUSHCONT_SHORT([
-                        THROW_SMALL(2),
+                        THROW_SHORT(2),
                     ]),
                     IFELSE(),
                 ]]]),

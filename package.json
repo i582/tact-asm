@@ -2,7 +2,8 @@
     "name": "tact-asm",
     "scripts": {
         "fmt": "prettier --write -l --cache .",
-        "fmt:check": "prettier --check --cache ."
+        "fmt:check": "prettier --check --cache .",
+        "test": "jest"
     },
     "packageManager": "yarn@4.6.0",
     "dependencies": {

@@ -10,7 +10,7 @@ export const EPS = (): EPS => {
     }
 }
 
-export const THROW_SMALL = (arg: number): Instr => {
+export const THROW_SHORT = (arg: number): Instr => {
     return {
         store: (b: Builder) => {
             b.storeUint(0xf20 | (arg >> 4), 12)
@@ -22,7 +22,8 @@ export const THROW_SMALL = (arg: number): Instr => {
 export const XCHG_0 = (arg: number) => {
     return {
         store: (b: Builder) => {
-            b.storeUint(0x02 | (arg & 15), 8)
+            // b.storeUint(0x02, 8)
+            b.storeUint(arg & 15, 8)
         },
     }
 }
@@ -73,14 +74,38 @@ export const PUSHCONT = (instructions: Instr[]) => {
         // PUSHCONT_4: cat('cell_const', mkext(0, 0x9, 4, 4, slice(uint(4), 0), `exec_push_cont_simple`)),
 
         store: (b: Builder) => {
-            b.storeUint(0x8e8 >> 3, 9)
-            b.storeUint(0, 1) // r
-            b.storeUint(0, 2) // xx
-            b.storeUint(0, 4) // cccc
-
             const cell = compileCell(instructions)
+            const refs = cell.refs.length
+            if (refs === 0) {
+                b.storeUint(0x8e0 >> 3, 9)
+            } else if (refs === 1) {
+                b.storeUint(0x8e8 >> 3, 9)
+            } else if (refs === 2) {
+                b.storeUint(0x8f0 >> 3, 9)
+            } else if (refs === 3) {
+                b.storeUint(0x8f8 >> 3, 9)
+            } else {
+                throw new Error("too many refs")
+            }
 
-            b.storeRef(cell)
+            const slice = cell.asSlice()
+            const length = slice.remainingBits
+
+            const y = Math.ceil(length / 8)
+            b.storeUint(y, 7)
+
+            b.storeSlice(slice)
+
+            // b.storeUint(0x1, 1)
+
+            const realLength = y * 8
+            if (realLength - length > 0) {
+                b.storeUint(0x0, realLength - length)
+            }
+
+            // for (const ref of cell.refs) {
+            //     b.storeRef(ref)
+            // }
         },
     }
 }
@@ -107,6 +132,15 @@ export const PUSHCONT_SHORT = (instructions: Instr[]) => {
 }
 
 // SECTION: Ref instructions
+export const PSEUDO_PUSHREF = (instructions: Instr[]) => {
+    return {
+        name: "PSEUDO_PUSHREF",
+        store: (b: Builder) => {
+            b.storeRef(compileCell(instructions))
+        },
+    }
+}
+
 export const PUSHREF = createRefInstr(0x88, 8)
 export const PUSHREFSLICE = createRefInstr(0x89, 8)
 export const PUSHREFCONT = createRefInstr(0x8a, 8)

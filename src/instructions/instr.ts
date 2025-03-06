@@ -1,12 +1,14 @@
-import {Builder, Cell} from "@ton/core"
+import {Builder, Cell, BitBuilder, Slice} from "@ton/core"
 import {Ty} from "./asm1"
 
 export type Instr = {
+    name?: string,
     store: (b: Builder) => void
 }
 
-export const createSimpleInstr = (prefix: number, prefixLength: number): Instr => {
+export const createSimpleInstr = (name: string, prefix: number, prefixLength: number): Instr => {
     return {
+        name,
         store: (b: Builder) => {
             b.storeUint(prefix, prefixLength)
         },
@@ -21,7 +23,14 @@ export const createUnaryInstr = <T>(
     return arg => {
         return {
             store: (b: Builder) => {
-                b.storeUint(prefix, prefixLength)
+                try {
+                    b.storeUint(prefix, prefixLength)
+                } catch(e) {
+                    // @ts-ignore
+                    const bits = b._bits as BitBuilder
+                    console.log(bits.buffer().toString("hex"))
+                    throw e
+                }
                 serializer.store(arg, b)
             },
         }
@@ -86,6 +95,7 @@ export const createRefInstr = (
 ): ((instructions: Instr[]) => Instr) => {
     return instructions => {
         return {
+            name: "PUSHREF",
             store: (b: Builder) => {
                 b.storeUint(prefix, prefixLength)
                 b.storeRef(compileCell(instructions))
@@ -102,8 +112,48 @@ export const compile = (instructions: Instr[]): Buffer => {
 
 export const compileCell = (instructions: Instr[]): Cell => {
     const b = new Builder()
-    instructions.forEach(instruction => {
+    // instructions.forEach(it => {
+    //     const b = new Builder()
+    //     it.store(b)
+    //     process.stderr.write(b.asSlice().toString())
+    //     process.stderr.write("\n")
+    // })
+    instructions.forEach((instruction) => {
+        // process.stderr.write("length: ")
+        // process.stderr.write(instructions.length.toString())
+        // process.stderr.write(" ")
+        // process.stderr.write(index.toString())
+        // process.stderr.write("\n")
         instruction.store(b)
     })
-    return b.endCell()
+    try {
+        return b.endCell()
+    } catch (e) {
+        // @ts-ignore
+        const bits = b._bits as BitBuilder
+        console.log(bits.buffer().toString("hex"))
+        throw e
+    }
+}
+
+export const hex = (value: string): Slice => {
+    const b = new Builder()
+
+    let res2 = ""
+    for (let i = 0; i < value.length; i++) {
+        const ch = value[i]
+        if (ch === "_") break
+        res2 += Number.parseInt(ch, 16).toString(2).padStart(4, "0")
+    }
+
+    if (value.endsWith("_")) {
+        res2 = res2.replace(/10*$/, "")
+    }
+
+    for (let i = 0; i < res2.length; i++) {
+        const ch = res2[i]
+        b.storeBit(ch === "1")
+    }
+
+    return b.asSlice()
 }

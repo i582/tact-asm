@@ -23,3 +23,12 @@ export const execute = (f: Func, ...args: Instr[]): Instr => {
         },
     }
 }
+
+export const debug = (instr: Instr) => {
+    return {
+        store: (b: Builder) => {
+            debugger
+            instr.store(b)
+        },
+    }
+}
