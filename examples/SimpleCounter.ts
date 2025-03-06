@@ -31,7 +31,7 @@ export const instructions = [
           i.BLKDROP2([1 , 2]),                      // 0x6C 1 2
       ]),                                         // 0x9 D31FD31F596C12
       i.PUSHCONT([
-          i.PUSHINT_1(257),                         // 0x81 0101
+          i.PUSHINT_8(257),                         // 0x81 0101
           i.LDIX(),                                 // 0xD700
           i.XCHG_0(1),                              // 0x0 1
           i.XCHG_0(1),                              // 0x0 1
@@ -118,7 +118,7 @@ export const instructions = [
         i.BLKDROP2([1 , 2]),                      // 0x6C 1 2
       ]),                                         // 0x9 D31FD31F596C12
       i.PUSHCONT([
-        i.PUSHINT_1(257),                         // 0x81 0101
+        i.PUSHINT_8(257),                         // 0x81 0101
         i.LDIX(),                                 // 0xD700
         i.SWAP(),                              // 0x0 1
         i.SWAP(),                              // 0x0 1
@@ -143,7 +143,7 @@ export const instructions = [
         i.BLKDROP2([1 , 2]),                      // 0x6C 1 2
       ]),                                         // 0x9 D31FD31F596C12
       i.PUSHCONT([
-        i.PUSHINT_1(257),                         // 0x81 0101
+        i.PUSHINT_8(257),                         // 0x81 0101
         i.LDIX(),                                 // 0xD700
         i.SWAP(),                              // 0x0 1
         i.SWAP(),                              // 0x0 1

@@ -11,6 +11,7 @@ import {
     IFNBITJMPREF,
 } from "../instructions"
 import {AssemblyWriter, disassembleRoot} from "@tact-lang/opcode"
+import {call} from "../instructions/helpers"
 
 interface TestCase {
     readonly name: string
@@ -60,7 +61,7 @@ PROGRAM{
                     [0, [
                         IFNBITJMPREF(2, [
                             PUSHINT(1),
-                            PUSHINT(1),
+                            PUSHINT(2),
                             ADD(),
                         ])
                     ]],
@@ -75,9 +76,35 @@ PROGRAM{
   recv_internal PROC:<{
     2 <{
       1 PUSHINT
-      1 PUSHINT
+      2 PUSHINT
       ADD
     }>c IFNBITJMPREF
+  }>
+}END>c`,
+    },
+
+    {
+        name: "call",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        call(ADD(), [PUSHINT(1), PUSHINT(2)])
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        expected: `"Asm.fif" include
+PROGRAM{
+  DECLPROC recv_internal
+  recv_internal PROC:<{
+    1 PUSHINT
+    2 PUSHINT
+    ADD
   }>
 }END>c`,
     },

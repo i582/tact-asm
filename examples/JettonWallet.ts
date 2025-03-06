@@ -32,7 +32,7 @@ export const instructions = [
         i.XCHG_0(4),                              // 0x0 4
         i.IFJMPREF([
           i.XCHG_0(2),                            // 0x0 2
-          i.PUSHINT_2(32),                        // 0x80 20
+          i.PUSHINT_8(32),                        // 0x80 20
           i.SDSKIPFIRST(),                        // 0xD721
           i.PUSHINT(0),                           // 0x7 0
           i.PUSH(1),                              // 0x2 1
@@ -180,7 +180,7 @@ export const instructions = [
                     i.THROWIFNOT_1(709),                      // 0xF2E4_ 58B_
                     i.XCHG2(4 , 3),                         // 0x50 4 3
                     i.PUSHINT(0),                           // 0x7 0
-                    i.PUSHINT_2(64),                        // 0x80 40
+                    i.PUSHINT_8(64),                        // 0x80 40
                     i.PUSHREF([
                         i.PUSHINT(-1),                        // 0x7 F
                         i.PUSH(10),                           // 0x2 A
@@ -261,7 +261,7 @@ export const instructions = [
                         i.SWAP(),                             // 0x0 1
                         i.PUSHREF([
                             i.STGRAMS(),                        // 0xFA02
-                            i.PUSHINT_2(105),                   // 0x80 69
+                            i.PUSHINT_8(105),                   // 0x80 69
                             i.STZEROES(),                       // 0xCF40
                             i.STSLICECONST(beginCell().storeBits(new BitString(Buffer.from("8c", "hex"), 0, 7)).asSlice()), // 0xCFC0_ 8D_
                             i.STDICT(),                         // 0xF400
@@ -411,8 +411,8 @@ export const instructions = [
                             i.PUSH(8),                          // 0x2 8
                             i.XCHG_0(4),                        // 0x0 4
                             i.XCHG_1([3, 8]),                   // 0x10 3 8
-                            i.XCHG3(5 , 0 , 0),                 // 0x4 5 0 0
-                            i.XCHG3(4 , 1 , 3),                 // 0x4 4 1 3
+                            i.XCHG3(5, 0, 0),                 // 0x4 5 0 0
+                            i.XCHG3(4, 1, 3),                 // 0x4 4 1 3
                             i.ROTREV(),                         // 0x59
                             i.NEWC(),                           // 0xC8
                             i.STSLICECONST(beginCell().storeBits(new BitString(Buffer.from("40", "hex"), 0, 2)).asSlice()), // 0xCFC0_ 6_
@@ -421,7 +421,7 @@ export const instructions = [
                             i.STSLICE(),                        // 0xCE
                             i.SWAP(),                           // 0x0 1
                             i.STGRAMS(),                        // 0xFA02
-                            i.PUSHINT_2(106),                   // 0x80 6A
+                            i.PUSHINT_8(106),                   // 0x80 6A
                             i.STZEROES(),                       // 0xCF40
                             i.STDICT(),                         // 0xF400
                             i.ENDC(),                           // 0xC9
@@ -451,7 +451,7 @@ export const instructions = [
                             i.IFELSE(),                           // 0xE2
                             i.PUSHREF([
                                 i.PUSHCONT([
-                                    i.BLKDROP2([3 , 1]),                // 0x6C 3 1
+                                    i.BLKDROP2([3, 1]),                // 0x6C 3 1
                                 ]),                                   // 0x9 6C31
                                 i.IFREFELSE([
                                     i.PUSHINT(2),                       // 0x7 2
@@ -465,8 +465,8 @@ export const instructions = [
                                     i.STU(64),                          // 0xCB 3F
                                     i.ENDC(),                           // 0xC9
                                     i.XCHG_1([3, 5]),                   // 0x10 3 5
-                                    i.XCHG3(1 , 5 , 0),                 // 0x4 1 5 0
-                                    i.XCHG3(4 , 1 , 3),                 // 0x4 4 1 3
+                                    i.XCHG3(1, 5, 0),                 // 0x4 1 5 0
+                                    i.XCHG3(4, 1, 3),                 // 0x4 4 1 3
                                     i.ROTREV(),                         // 0x59
                                     i.NEWC(),                           // 0xC8
                                     i.STSLICECONST(beginCell().storeBits(new BitString(Buffer.from("40", "hex"), 0, 2)).asSlice()), // 0xCFC0_ 6_
@@ -475,7 +475,7 @@ export const instructions = [
                                     i.STSLICE(),                        // 0xCE
                                     i.SWAP(),                           // 0x0 1
                                     i.STGRAMS(),                        // 0xFA02
-                                    i.PUSHINT_2(106),                   // 0x80 6A
+                                    i.PUSHINT_8(106),                   // 0x80 6A
                                     i.STZEROES(),                       // 0xCF40
                                     i.STDICT(),                         // 0xF400
                                     i.ENDC(),                           // 0xC9
@@ -518,14 +518,14 @@ export const instructions = [
                         i.SWAP(),                           // 0x0 1
                     ]),                                   // 0x9 6D01
                     i.IFELSE(),                           // 0xE2
-                    i.BLKSWAP(4 , 1),                     // 0x55 3 0
+                    i.BLKSWAP(4, 1),                     // 0x55 3 0
                     i.POP(0),                             // 0x3 0
                     i.POP(3),                             // 0x3 3
                     i.GETGLOB(2),                         // 0xF85_ 14_
-                    i.PUXC(5 , -1),                       // 0x52 5 0
+                    i.PUXC(5, -1),                       // 0x52 5 0
                     i.SDEQ(),                             // 0xC705
                     i.THROWIFNOT_1(705),                    // 0xF2E4_ 583_
-                    i.XCPU(3 , 3),                        // 0x51 3 3
+                    i.XCPU(3, 3),                        // 0x51 3 3
                     i.SUB(),                              // 0xA1
                     i.PUSH(0),                            // 0x2 0
                     i.GTINT(-1),                          // 0xC2 FF
@@ -549,7 +549,7 @@ export const instructions = [
                     i.GREATER(),                          // 0xBC
                     i.THROWIFNOT_1(707),                    // 0xF2E4_ 587_
                     i.PUSHINT(0),                         // 0x7 0
-                    i.PUSHINT_2(64),                      // 0x80 40
+                    i.PUSHINT_8(64),                      // 0x80 40
                     i.XC2PU(3 , 5 , 6),                   // 0x541 3 5 6
                     i.PUSHINT(-1),                        // 0x7 F
                     i.XCHG_0(6),                          // 0x0 6
@@ -579,7 +579,7 @@ export const instructions = [
                         i.STSLICE(),                          // 0xCE
                         i.SWAP(),                             // 0x0 1
                         i.STGRAMS(),                          // 0xFA02
-                        i.PUSHINT_2(106),                     // 0x80 6A
+                        i.PUSHINT_8(106),                     // 0x80 6A
                         i.PUSHREF([
                             i.STZEROES(),                       // 0xCF40
                             i.STDICT(),                         // 0xF400
