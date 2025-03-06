@@ -40,7 +40,6 @@ export const createFixedRangeInstr = <T>(prefix: number, prefixLength: number, s
     }
 }
 
-export const SETCP = createFixedRangeInstr(0xff00, 8, 8, seq1(uint(8)));
 export const SETCP_1 = createFixedRangeInstr(0xfff1, 8, 8, seq1(delta(-256, uint(8))));
 export const PUSHPOW2 = createFixedRangeInstr(0x8300, 8, 8, seq1(delta(1, uint(8))));
 export const BLKPUSH = createFixedRangeInstr(0x5f10, 8, 8, seq2(uint(4), uint(4)));
