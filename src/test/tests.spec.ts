@@ -13,6 +13,9 @@ import {
     IFELSE,
     PUSHCONT_SHORT,
     THROW_SMALL,
+    SDBEGINSX,
+    SBITS,
+    SDBEGINS,
 } from "../instructions"
 import {beginCell, Cell} from "@ton/core"
 import {compileFunc} from "@ton-community/func-js"
@@ -128,6 +131,54 @@ const TESTS: TestCase[] = [
                 } else {
                     throw(2);
                 }
+            }`,
+    },
+    {
+        name: "SDBEGINSX",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                // prettier-ignore
+                new Map([[0, [
+                    SDBEGINSX(),
+                    SBITS(),
+                    THROWANY(),
+                ]]]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        funcCode: `
+            slice sd_begins(slice where, slice to_find) asm "SDBEGINSX";
+            int bits(slice where) asm "SBITS";
+        
+            () recv_internal(slice s1, slice s2) impure {
+                var s3 = sd_begins(s1, s2);
+                throw(bits(s3));
+            }`,
+    },
+    {
+        name: "SDBEGINS",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                // prettier-ignore
+                new Map([[0, [
+                    SDBEGINS(beginCell().storeUint(0n, 4).asSlice()),
+                    SBITS(),
+                    THROWANY(),
+                ]]]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        funcCode: `
+            slice sd_begins(slice where) asm "b{0000} SDBEGINS";
+            int bits(slice where) asm "SBITS";
+        
+            () recv_internal(slice s1) impure {
+                var s3 = sd_begins(s1);
+                throw(bits(s3));
             }`,
     },
 ]

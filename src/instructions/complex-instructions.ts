@@ -1,6 +1,6 @@
 import {compileCell, createRefInstr, Instr} from "./instr"
 import {beginCell, Builder, Cell, Dictionary, DictionaryValue, Slice} from "@ton/core"
-import {largeInt} from "./asm1"
+import {largeInt, slice, uint} from "./asm1"
 
 export type EPS = Instr
 
@@ -129,6 +129,52 @@ export const IFREFELSEREF = (trueBranch: Instr[], falseBranch: Instr[]): Instr =
         },
     }
 }
+
+export const IFBITJMPREF_BASE = (neg: boolean, num: number, instructions: Instr[]): Instr => {
+    return {
+        store: (b: Builder) => {
+            b.storeUint(0xe3c0 >> 6, 10)
+
+            b.storeBit(neg) // if negation
+            uint(5).store(num, b)
+            b.storeRef(compileCell(instructions))
+        },
+    }
+}
+// IFBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
+export const IFBITJMPREF = (num: number, instructions: Instr[]) =>
+    IFBITJMPREF_BASE(false, num, instructions)
+
+// IFNBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
+export const IFNBITJMPREF = (num: number, instructions: Instr[]) =>
+    IFBITJMPREF_BASE(true, num, instructions)
+// END SECTION
+
+// SECTION: sdbegins
+export const SDBEGINS_BASE = (prefix: number, slice: Slice): Instr => {
+    return {
+        store: (b: Builder) => {
+            b.storeUint(prefix, 14)
+
+            const length = slice.remainingBits + 1
+
+            const y = Math.ceil((length - 3) / 8)
+            b.storeUint(y, 7)
+
+            b.storeSlice(slice)
+
+            b.storeUint(0x1, 1)
+            const realLength = y * 8 + 3
+            if (realLength - length > 0) {
+                b.storeUint(0x0, realLength - length)
+            }
+        },
+    }
+}
+// SDBEGINS: cat('cell_deserialize', mkext(0, 0xd728 >> 2, 14, 7, slice(uint(7), 3), `exec_slice_begins_with_const`)),
+export const SDBEGINS = (slice: Slice) => SDBEGINS_BASE(0xd728 >> 2, slice)
+// SDBEGINSQ: cat('cell_deserialize', mkext(0, 0xd72c >> 2, 14, 7, slice(uint(7), 3), `exec_slice_begins_with_const`)),
+export const SDBEGINSQ = (slice: Slice) => SDBEGINS_BASE(0xd72c >> 2, slice)
 // END SECTION
 
 export const PUSHINT_LONG = (val: bigint) => {
@@ -149,7 +195,7 @@ export const PUSHINT_LONG = (val: bigint) => {
     }
 }
 
-export const STSLICECONST = (slice: Slice) => {
+export const STSLICECONST = (slice: Slice): Instr => {
     if (slice.remainingBits >= 8 * 7 + 2) {
         throw new Error("too big slice")
     }

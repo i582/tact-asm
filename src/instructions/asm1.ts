@@ -673,8 +673,6 @@ const instructions = {
     SDCUTLAST: cat('cell_deserialize', mksimple(0xd722, 16, `x => exec_slice_op_args(x, 'SDCUTLAST', 1023, (cs, bits) => cs.only_last(bits))`)),
     SDSKIPLAST: cat('cell_deserialize', mksimple(0xd723, 16, `x => exec_slice_op_args(x, 'SDSKIPLAST', 1023, (cs, bits) => cs.skip_last(bits))`)),
     SDSUBSTR: cat('cell_deserialize', mksimple(0xd724, 16, `x => exec_slice_op_args2(x, 'SDSUBSTR', 1023, 1023, (cs, offs, bits) => cs.skip_first(offs) && cs.only_first(bits))`)),
-    SDBEGINSX: cat('cell_deserialize', mksimple(0xd726, 16, `(_1) => exec_slice_begins_with(_1, false)`)),
-    SDBEGINSXQ: cat('cell_deserialize', mksimple(0xd727, 16, `(_1) => exec_slice_begins_with(_1, true)`)),
     SCUTFIRST: cat('cell_deserialize', mksimple(0xd730, 16, `x => exec_slice_op_args2(x, 'SCUTFIRST', 1023, 4, (cs, bits, refs) => cs.only_first(bits, refs))`)),
     SSKIPFIRST: cat('cell_deserialize', mksimple(0xd731, 16, `x => exec_slice_op_args2(x, 'SSKIPFIRST', 1023, 4, (cs, bits, refs) => cs.skip_first(bits, refs))`)),
     SCUTLAST: cat('cell_deserialize', mksimple(0xd732, 16, `x => exec_slice_op_args2(x, 'SCUTLAST', 1023, 4, (cs, bits, refs) => cs.only_last(bits, refs))`)),
@@ -1326,16 +1324,20 @@ const instructions = {
     IFREFELSE: cat('continuation_cond_loop', mkext(1, 0xe30d, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_ifelse_ref(_1, _2, _4, true)`)),
     IFELSEREF: cat('continuation_cond_loop', mkext(1, 0xe30e, 16, 0, noArgs, `(_1, _2, _3, _4) => exec_ifelse_ref(_1, _2, _4, false)`)),
     IFREFELSEREF: cat('continuation_cond_loop', mkext(2, 0xe30f, 16, 0, noArgs, `exec_ifref_elseref`)),
+
+    IFBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
+    IFNBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
     // END SECTION
 
     DICTPUSHCONST: cat('dictionary', mkextrange(1, 0xf4a400, 0xf4a800, 24, 11, seq2(uint(1), uint(10)), `exec_push_const_dict`)),
     PFXDICTSWITCH: cat('dictionary', mkextrange(1, 0xf4ac00, 0xf4b000, 24, 11, seq2(uint(1), uint(10)), `exec_const_pfx_dict_switch`)),
 
+    // SECTION: sdbegins
+    SDBEGINSX: cat('cell_deserialize', mksimple(0xd726, 16, `(_1) => exec_slice_begins_with(_1, false)`)),
+    SDBEGINSXQ: cat('cell_deserialize', mksimple(0xd727, 16, `(_1) => exec_slice_begins_with(_1, true)`)),
     SDBEGINS: cat('cell_deserialize', mkext(0, 0xd728 >> 2, 14, 7, slice(uint(7), 3), `exec_slice_begins_with_const`)),
     SDBEGINSQ: cat('cell_deserialize', mkext(0, 0xd72c >> 2, 14, 7, slice(uint(7), 3), `exec_slice_begins_with_const`)),
-
-    IFBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
-    IFNBITJMPREF: cat('continuation_cond_loop', mkext(1, 0xe3c >> 1, 11, 5, seq1(uint(5)), `exec_if_bit_jmpref`)),
+    // END SECTION
 
     STREFCONST: cat('cell_serialize', mkext(1, 0xcf20, 16, 0, noArgs, `exec_store_const_ref`)),
     STREF2CONST: cat('cell_serialize', mkext(2, 0xcf21, 16, 0, noArgs, `exec_store_const_ref`)),
@@ -1487,15 +1489,16 @@ const instructions = {
     // SLICE
     // <{ <{}> PUSHCONT }> SLICE
     PUSHSLICE: cat('cell_const', mkext(0, 0x8b,        8, 4, slice(uint(4), 4), `exec_push_slice`)),
-    PUSHSLICE_1: cat('cell_const', mkext(1, 0x8c0 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-    PUSHSLICE_2: cat('cell_const', mkext(2, 0x8c4 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-    PUSHSLICE_3: cat('cell_const', mkext(3, 0x8c8 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-    PUSHSLICE_4: cat('cell_const', mkext(4, 0x8cc >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-    PUSHSLICE_5: cat('cell_const', mkext(0, 0x8d0 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
-    PUSHSLICE_6: cat('cell_const', mkext(1, 0x8d2 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
-    PUSHSLICE_7: cat('cell_const', mkext(2, 0x8d4 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
-    PUSHSLICE_8: cat('cell_const', mkext(3, 0x8d6 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
-    PUSHSLICE_9: cat('cell_const', mkext(4, 0x8d8 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+    PUSHSLICE_REFS_1: cat('cell_const', mkext(1, 0x8c0 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+    PUSHSLICE_REFS_2: cat('cell_const', mkext(2, 0x8c4 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+    PUSHSLICE_REFS_3: cat('cell_const', mkext(3, 0x8c8 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+    PUSHSLICE_REFS_4: cat('cell_const', mkext(4, 0x8cc >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+
+    PUSHSLICE_LONG_0: cat('cell_const', mkext(0, 0x8d0 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+    PUSHSLICE_LONG_1: cat('cell_const', mkext(1, 0x8d2 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+    PUSHSLICE_LONG_2: cat('cell_const', mkext(2, 0x8d4 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+    PUSHSLICE_LONG_3: cat('cell_const', mkext(3, 0x8d6 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+    PUSHSLICE_LONG_4: cat('cell_const', mkext(4, 0x8d8 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
 
     // CONT {}
     PUSHCONT: cat('cell_const', mkext(0, 0x8e0 >> 3, 9, 7, slice(uint(7), 0), `exec_push_cont`)),
