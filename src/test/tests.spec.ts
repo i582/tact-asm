@@ -16,6 +16,8 @@ import {
     SDBEGINSX,
     SBITS,
     SDBEGINS,
+    PUSHSLICE,
+    hex,
 } from "../instructions"
 import {beginCell, Cell} from "@ton/core"
 import {compileFunc} from "@ton-community/func-js"
@@ -179,6 +181,32 @@ const TESTS: TestCase[] = [
             () recv_internal(slice s1) impure {
                 var s3 = sd_begins(s1);
                 throw(bits(s3));
+            }`,
+    },
+
+    {
+        name: "PUSHINT_LONG",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        PUSHSLICE(hex("6_")),
+                        SBITS(),
+                        THROWANY(),
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        funcCode: `
+            slice push_slice() asm "x{6_} PUSHSLICE";
+            int bits(slice where) asm "SBITS";
+        
+            () recv_internal() impure {
+                throw(push_slice().bits());
             }`,
     },
 ]

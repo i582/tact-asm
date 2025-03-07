@@ -7,8 +7,9 @@ import type {
     ScalarNode,
 } from "../ast/ast"
 import {BaseWriter} from "./base-writer"
-import {Cell} from "@ton/core"
-import {prefixToBin} from "../utils/binutils"
+import {beginCell, BitString, Cell} from "@ton/core"
+import {prefixToBin, removeCompletionTag} from "../utils/binutils"
+import {Buffer} from "node:buffer"
 
 const OPCODE_RENAMES = new Map([
     ["PUSHINT_4", "PUSHINT"],
@@ -51,11 +52,17 @@ export class TSAssemblyWriter {
     }
 
     protected writeProgramNode(node: ProgramNode): void {
-        this.writer.writeLine("import * as i from \"./instr-gen\";")
-        this.writer.writeLine("import {beginCell, BitString} from \"@ton/core\";\n")
+        this.writer.writeLine('import * as i from "../instructions";\n')
 
-        this.writer.writeLine("const instructions = [")
+        this.writer.writeLine("export const instructions = [")
         this.writer.indent(() => {
+            if (node.topLevelInstructions.length > 0) {
+                node.topLevelInstructions.forEach(instruction => {
+                    this.writeInstructionNode(instruction)
+                })
+                return
+            }
+
             this.writer.writeLine("i.SETCP(0),")
             this.writer.writeLine("i.PUSHDICTCONST(new Map([")
             this.writer.indent(() => {
@@ -127,7 +134,7 @@ export class TSAssemblyWriter {
         }
 
         if (opcode === "XCHG_1I") {
-            return `i.XCHG_1([1, ${firstArg.toString()}])`
+            return `i.XCHG_3([1, ${firstArg.toString()}])`
         }
 
         if (opcode === "XCHG_0I_LONG") {
@@ -226,32 +233,9 @@ export class TSAssemblyWriter {
                         break
                     }
 
-                    function booleanArrayToBuffer(bools: boolean[]): Buffer {
-                        const byteLength = Math.ceil(bools.length / 8)
-                        const buffer = Buffer.alloc(byteLength)
-
-                        for (let i = 0; i < bools.length; i++) {
-                            if (bools[i]) {
-                                buffer[Math.floor(i / 8)] |= 1 << (7 - (i % 8))
-                            }
-                        }
-
-                        return buffer
-                    }
-
                     if (typeof arg.value === "string" && arg.value.startsWith("x")) {
                         const value = arg.value.slice(2, -1)
-
-                        const bin = prefixToBin(value)
-
-                        const res: boolean[] = []
-                        for (let i = 0; i < bin.length; i++) {
-                            const bit = bin.at(i)
-                            res.push(bit)
-                        }
-
-                        const buff = booleanArrayToBuffer(res)
-                        this.writer.write(`beginCell().storeBits(new BitString(Buffer.from("${buff.toString("hex")}", "hex"), 0, ${res.length})).asSlice()`)
+                        this.writer.write(`i.hex("${value}")`)
                         break
                     }
 

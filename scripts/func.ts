@@ -41,6 +41,6 @@ compileFunc({
 }).then(it => {
     if (it.status === "ok") {
         console.log(it.codeBoc)
-        console.log(Buffer.from(it.codeBoc, "base64").toString("hex"));
+        console.log(Buffer.from(it.codeBoc, "base64").toString("hex"))
     }
 })

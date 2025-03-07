@@ -2,7 +2,7 @@ import {Builder, Cell, BitBuilder, Slice} from "@ton/core"
 import {Ty} from "./asm1"
 
 export type Instr = {
-    name?: string,
+    name?: string
     store: (b: Builder) => void
 }
 
@@ -25,7 +25,7 @@ export const createUnaryInstr = <T>(
             store: (b: Builder) => {
                 try {
                     b.storeUint(prefix, prefixLength)
-                } catch(e) {
+                } catch (e) {
                     // @ts-ignore
                     const bits = b._bits as BitBuilder
                     console.log(bits.buffer().toString("hex"))
@@ -112,28 +112,10 @@ export const compile = (instructions: Instr[]): Buffer => {
 
 export const compileCell = (instructions: Instr[]): Cell => {
     const b = new Builder()
-    // instructions.forEach(it => {
-    //     const b = new Builder()
-    //     it.store(b)
-    //     process.stderr.write(b.asSlice().toString())
-    //     process.stderr.write("\n")
-    // })
-    instructions.forEach((instruction) => {
-        // process.stderr.write("length: ")
-        // process.stderr.write(instructions.length.toString())
-        // process.stderr.write(" ")
-        // process.stderr.write(index.toString())
-        // process.stderr.write("\n")
+    instructions.forEach(instruction => {
         instruction.store(b)
     })
-    try {
-        return b.endCell()
-    } catch (e) {
-        // @ts-ignore
-        const bits = b._bits as BitBuilder
-        console.log(bits.buffer().toString("hex"))
-        throw e
-    }
+    return b.endCell()
 }
 
 export const hex = (value: string): Slice => {

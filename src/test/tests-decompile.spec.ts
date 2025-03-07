@@ -10,6 +10,8 @@ import {
     ADD,
     IFNBITJMPREF,
     MUL,
+    PUSHSLICE,
+    hex,
 } from "../instructions"
 import {AssemblyWriter, disassembleRoot} from "@tact-lang/opcode"
 import {call, execute} from "../instructions/helpers"
@@ -121,6 +123,37 @@ PROGRAM{
                     // prettier-ignore
                     [0, [
                         execute(someFunction, PUSHINT(1), PUSHINT(2), PUSHINT(3))
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        expected: `"Asm.fif" include
+PROGRAM{
+  DECLPROC recv_internal
+  recv_internal PROC:<{
+    1 PUSHINT
+    2 PUSHINT
+    3 PUSHINT
+    <{
+      MUL
+      ADD
+    }> PUSHCONT
+    EXECUTE
+  }>
+}END>c`,
+    },
+
+    {
+        name: "PUSHSLICE",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        PUSHSLICE(hex("6_")),
                     ]],
                 ]),
             ),

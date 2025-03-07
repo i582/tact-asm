@@ -63,6 +63,19 @@ export const PUSHDICTCONST = (mapping: Map<number, Instr[]>): Instr => {
     }
 }
 
+export const DICTPUSHCONST = (slice: Slice, num: number): Instr => {
+    return {
+        store: (b: Builder) => {
+            b.storeUint(0xf4a400 >> 11, 13) // 0b1111010010100110
+            b.storeUint(1, 1)
+
+            b.storeRef(slice.asCell())
+
+            b.storeUint(num, 10)
+        },
+    }
+}
+
 export const PUSHCONT = (instructions: Instr[]) => {
     return {
         // 8F_rxxcccc
@@ -98,7 +111,68 @@ export const PUSHCONT = (instructions: Instr[]) => {
 
             // b.storeUint(0x1, 1)
 
+            // TODO: remove
             const realLength = y * 8
+            if (realLength - length > 0) {
+                b.storeUint(0x0, realLength - length)
+            }
+
+            // for (const ref of cell.refs) {
+            //     b.storeRef(ref)
+            // }
+        },
+    }
+}
+
+export const PUSHSLICE = (slice: Slice) => {
+    return {
+        // PUSHSLICE: cat('cell_const', mkext(0, 0x8b,        8, 4, slice(uint(4), 4), `exec_push_slice`)),
+        // PUSHSLICE_REFS_1: cat('cell_const', mkext(1, 0x8c0 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+        // PUSHSLICE_REFS_2: cat('cell_const', mkext(2, 0x8c4 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+        // PUSHSLICE_REFS_3: cat('cell_const', mkext(3, 0x8c8 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+        // PUSHSLICE_REFS_4: cat('cell_const', mkext(4, 0x8cc >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+
+        store: (b: Builder) => {
+            const refs = slice.remainingRefs
+
+            if (refs === 0) {
+                b.storeUint(0x8b, 8)
+
+                const length = slice.remainingBits + 1
+                const y = Math.ceil((length - 4) / 8)
+                b.storeUint(y, 4)
+
+                b.storeSlice(slice)
+                b.storeUint(0x1, 1)
+
+                const realLength = y * 8 + 4
+                if (realLength - length > 0) {
+                    b.storeUint(0x0, realLength - length)
+                }
+                return
+            }
+
+            const length = slice.remainingBits + 1
+            if (refs === 1) {
+                b.storeUint(0x8c0 >> 2, 10)
+            } else if (refs === 2) {
+                b.storeUint(0x8c4 >> 2, 10)
+            } else if (refs === 3) {
+                b.storeUint(0x8c8 >> 2, 10)
+            } else if (refs === 4) {
+                b.storeUint(0x8cc >> 2, 10)
+            } else {
+                throw new Error("too many refs")
+            }
+
+            const y = Math.ceil((length - 1) / 8)
+            b.storeUint(y, 5)
+
+            b.storeSlice(slice)
+
+            b.storeUint(0x1, 1)
+
+            const realLength = y * 8 + 1
             if (realLength - length > 0) {
                 b.storeUint(0x0, realLength - length)
             }
