@@ -2,6 +2,7 @@ import {Instr, compileCell} from "../instructions"
 import {instructions as jettonMinterInstructions} from "./testdata/jetton_minter_discoverable_JettonMinter.tasm"
 import {instructions as escrowInstructions} from "./testdata/escrow_Escrow.tasm"
 import {instructions as simpleCounterInstructions} from "./testdata/test_SimpleCounter.tasm"
+import {instructions as someContractInstructions} from "./testdata/SomeContract.tasm"
 import * as path from "node:path"
 import * as fs from "node:fs"
 import {Cell} from "@ton/core"
@@ -9,7 +10,8 @@ import {Cell} from "@ton/core"
 interface TestCase {
     readonly name: string
     readonly instructions: Instr[]
-    readonly bocPath: string
+    readonly bocPath?: string
+    readonly hexPath?: string
 }
 
 const TESTS: TestCase[] = [
@@ -28,13 +30,22 @@ const TESTS: TestCase[] = [
         instructions: escrowInstructions,
         bocPath: path.join(__dirname, "testdata", "escrow_Escrow.boc"),
     },
+    {
+        name: "SomeContract",
+        instructions: someContractInstructions,
+        hexPath: path.join(__dirname, "testdata", "SomeContract.hex"),
+    },
 ]
 
 describe("tests", () => {
-    TESTS.forEach(({name, instructions, bocPath}: TestCase) => {
+    TESTS.forEach(({name, instructions, bocPath, hexPath}: TestCase) => {
         it(`Test ${name}`, async () => {
             const compiled = compileCell(instructions)
-            const expectedBoc = Cell.fromBoc(fs.readFileSync(bocPath))[0]
+            const expectedBoc = bocPath
+                ? Cell.fromBoc(fs.readFileSync(bocPath))[0]
+                : hexPath
+                  ? Cell.fromHex(fs.readFileSync(hexPath, "utf8").trim())
+                  : new Cell()
 
             expect(compiled.toString()).toEqual(expectedBoc.toString())
         })
