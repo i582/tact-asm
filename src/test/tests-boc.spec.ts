@@ -1,5 +1,6 @@
 import {Instr, compileCell} from "../instructions"
 import {instructions as jettonMinterInstructions} from "./testdata/jetton_minter_discoverable_JettonMinter.tasm"
+import {instructions as escrowInstructions} from "./testdata/escrow_Escrow.tasm"
 import {instructions as simpleCounterInstructions} from "./testdata/test_SimpleCounter.tasm"
 import * as path from "node:path"
 import * as fs from "node:fs"
@@ -21,6 +22,11 @@ const TESTS: TestCase[] = [
         name: "JettonMinter",
         instructions: jettonMinterInstructions,
         bocPath: path.join(__dirname, "testdata", "jetton_minter_discoverable_JettonMinter.boc"),
+    },
+    {
+        name: "Escrow",
+        instructions: escrowInstructions,
+        bocPath: path.join(__dirname, "testdata", "escrow_Escrow.boc"),
     },
 ]
 
