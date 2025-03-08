@@ -125,6 +125,11 @@ export const PUSHCONT = (instructions: Instr[]) => {
 }
 
 export const PUSHSLICE = (slice: Slice) => {
+    const MAX_SLICE_LENGTH = 8 * 31 + 1
+    if (slice.remainingBits >= MAX_SLICE_LENGTH) {
+        return PUSHSLICE_LONG(slice)
+    }
+
     return {
         // PUSHSLICE: cat('cell_const', mkext(0, 0x8b,        8, 4, slice(uint(4), 4), `exec_push_slice`)),
         // PUSHSLICE_REFS_1: cat('cell_const', mkext(1, 0x8c0 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),

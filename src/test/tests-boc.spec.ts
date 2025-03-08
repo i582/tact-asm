@@ -3,6 +3,7 @@ import {instructions as jettonMinterInstructions} from "./testdata/jetton_minter
 import {instructions as escrowInstructions} from "./testdata/escrow_Escrow.tasm"
 import {instructions as simpleCounterInstructions} from "./testdata/test_SimpleCounter.tasm"
 import {instructions as someContractInstructions} from "./testdata/SomeContract.tasm"
+import {instructions as someContract2Instructions} from "./testdata/SomeContract2.tasm"
 import * as path from "node:path"
 import * as fs from "node:fs"
 import {Cell} from "@ton/core"
@@ -34,6 +35,11 @@ const TESTS: TestCase[] = [
         name: "SomeContract",
         instructions: someContractInstructions,
         hexPath: path.join(__dirname, "testdata", "SomeContract.hex"),
+    },
+    {
+        name: "SomeContract2",
+        instructions: someContract2Instructions,
+        hexPath: path.join(__dirname, "testdata", "SomeContract2.hex"),
     },
 ]
 

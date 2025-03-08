@@ -14,9 +14,6 @@ import {Buffer} from "node:buffer"
 const OPCODE_RENAMES = new Map([
     ["PUSHINT_4", "PUSHINT"],
     ["LSHIFTDIVMODR_VAR", "LSHIFTDIVMODR"],
-    ["LSHIFT_VAR", "LSHIFT"],
-    ["RSHIFTR_VAR", "RSHIFTR"],
-    ["RSHIFT_VAR", "RSHIFT"],
     ["MULRSHIFTC_VAR", "MULRSHIFTC"],
     ["MULRSHIFTR_VAR", "MULRSHIFTR"],
     ["MULRSHIFT_VAR", "MULRSHIFT"],
@@ -29,8 +26,8 @@ const OPCODE_RENAMES = new Map([
     ["QLSHIFTDIVMODR", "QLSHIFT_DIVMODR"],
     ["MULRSHIFTRMOD", "MULRSHIFTR_MOD"],
 
-    ["LSHIFT", "LSHIFT_"],
-    ["RSHIFT", "RSHIFT_"],
+    ["LSHIFT", "LSHIFT_1"],
+    ["RSHIFT", "RSHIFT_1"],
     ["MULRSHIFTR", "MULRSHIFTR_"],
     ["MULRSHIFTC", "MULRSHIFTC_"],
     ["MULMODPOW2", "MULMODPOW2_"],
@@ -38,6 +35,8 @@ const OPCODE_RENAMES = new Map([
     ["NULL", "PUSHNULL"],
     ["MULCONST", "MULINT"],
     ["ADDCONST", "ADDINT"],
+
+    ["SAVE", "SAVECTR"],
 ])
 
 export interface TSAssemblyWriterOptions {}
@@ -52,34 +51,33 @@ export class TSAssemblyWriter {
     }
 
     protected writeProgramNode(node: ProgramNode): void {
-        this.writer.writeLine('import * as i from "../instructions";\n')
+        this.writer.writeLine(`import * as i from "../instructions";`)
+
+        const methods = [...node.methods].sort((a, b) => a.id - b.id)
+        const procedures = [...node.procedures].sort((a, b) => a.hash.localeCompare(b.hash))
 
         this.writer.writeLine("export const instructions = [")
+
         this.writer.indent(() => {
-            if (node.topLevelInstructions.length > 0) {
-                node.topLevelInstructions.forEach(instruction => {
-                    this.writeInstructionNode(instruction)
-                })
-                return
-            }
+            node.topLevelInstructions.forEach(it => {
+                if (it.opcode.definition.mnemonic === "DICTPUSHCONST") {
+                    this.writer.writeLine("i.PUSHDICTCONST(new Map([")
+                    this.writer.indent(() => {
+                        methods.forEach(method => {
+                            this.writeMethodNode(method)
+                        })
+                        procedures.forEach(procedure => {
+                            this.writeNode(procedure)
+                        })
+                    })
+                    this.writer.writeLine("])),")
+                    return
+                }
 
-            this.writer.writeLine("i.SETCP(0),")
-            this.writer.writeLine("i.PUSHDICTCONST(new Map([")
-            this.writer.indent(() => {
-                const methods = [...node.methods].sort((a, b) => a.id - b.id)
-                const procedures = [...node.procedures].sort((a, b) => a.hash.localeCompare(b.hash))
-
-                methods.forEach(method => {
-                    this.writeMethodNode(method)
-                })
-                procedures.forEach(procedure => {
-                    this.writeNode(procedure)
-                })
+                this.writeNode(it)
             })
-            this.writer.writeLine("])),")
-            this.writer.writeLine("i.DICTIGETJMPZ(),")
-            this.writer.writeLine("i.THROWARG(11),")
         })
+
         this.writer.writeLine("];")
     }
 
@@ -245,7 +243,8 @@ export class TSAssemblyWriter {
                     throw new Error(`unexpected global ${arg.value}`)
                 }
                 case "method_reference": {
-                    throw new Error(`unexpected method reference ${arg.methodId}`)
+                    this.writer.write(arg.methodId.toString())
+                    break
                 }
                 case "block": {
                     this.writeBlockNode(arg)
