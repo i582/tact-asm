@@ -134,7 +134,7 @@ export class TSAssemblyWriter {
         }
 
         if (opcode === "XCHG_1I") {
-            return `i.XCHG_3([1, ${firstArg.toString()}])`
+            return `i.XCHG_3(1, ${firstArg.toString()})`
         }
 
         if (opcode === "XCHG_0I_LONG") {
