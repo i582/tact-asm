@@ -28,7 +28,7 @@ export const instructions = [
           i.LDU(32),                                // 0xD3 1F
           i.LDU(32),                                // 0xD3 1F
           i.ROTREV(),                               // 0x59
-          i.BLKDROP2([1 , 2]),                      // 0x6C 1 2
+          i.BLKDROP2(1 , 2),                      // 0x6C 1 2
       ]),                                         // 0x9 D31FD31F596C12
       i.PUSHCONT([
           i.PUSHINT_8(257),                         // 0x81 0101
@@ -66,8 +66,8 @@ export const instructions = [
               i.LDU(64),                                // 0xD3 3F
               i.LDU(32),                                // 0xD3 1F
               i.ROTREV(),                               // 0x59
-              i.BLKDROP2([2 , 1]),                      // 0x6C 2 1
-              i.XCHG_3([1, 2]),                         // 0x1 2
+              i.BLKDROP2(2 , 1),                      // 0x6C 2 1
+              i.XCHG_3(1, 2),                         // 0x1 2
               i.ADD(),                                  // 0xA0
               i.NEWC(),                                 // 0xC8
               i.PUSHINT(-1),                            // 0x7 F
@@ -85,7 +85,7 @@ export const instructions = [
           i.EQINT(0),                                 // 0xC0 00
           i.XCHG_0(2),                                // 0x0 2
           i.LESSINT(33),                              // 0xC1 21
-          i.XCHG_3([1, 2]),                           // 0x1 2
+          i.XCHG_3(1, 2),                           // 0x1 2
           i.AND(),                                    // 0xB0
           i.IFJMPREF([
               i.XCHG_0(1),                              // 0x0 1
@@ -115,7 +115,7 @@ export const instructions = [
         i.LDU(32),                                // 0xD3 1F
         i.LDU(32),                                // 0xD3 1F
         i.ROTREV(),                               // 0x59
-        i.BLKDROP2([1 , 2]),                      // 0x6C 1 2
+        i.BLKDROP2(1 , 2),                      // 0x6C 1 2
       ]),                                         // 0x9 D31FD31F596C12
       i.PUSHCONT([
         i.PUSHINT_8(257),                         // 0x81 0101
@@ -129,7 +129,7 @@ export const instructions = [
       i.CALLREF([
         i.PUSH_LONG(0),                                // 0x2 0
       ]),                                         // 0xDB3C 20
-      i.BLKDROP2([2 , 1]),                        // 0x6C 2 1
+      i.BLKDROP2(2 , 1),                        // 0x6C 2 1
     ]],
     [105872, [
       i.PUSHCTR(4),                               // 0xED4 4
@@ -140,7 +140,7 @@ export const instructions = [
         i.LDU(32),                                // 0xD3 1F
         i.LDU(32),                                // 0xD3 1F
         i.ROTREV(),                               // 0x59
-        i.BLKDROP2([1 , 2]),                      // 0x6C 1 2
+        i.BLKDROP2(1 , 2),                      // 0x6C 1 2
       ]),                                         // 0x9 D31FD31F596C12
       i.PUSHCONT([
         i.PUSHINT_8(257),                         // 0x81 0101
@@ -154,7 +154,7 @@ export const instructions = [
       i.CALLREF([
         i.PUSH_LONG(1),                                // 0x2 1
       ]),                                         // 0xDB3C 21
-      i.BLKDROP2([2 , 1]),                        // 0x6C 2 1
+      i.BLKDROP2(2 , 1),                        // 0x6C 2 1
     ]],
   ])),
   i.DICTIGETJMPZ(),

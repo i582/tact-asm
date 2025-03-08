@@ -205,10 +205,6 @@ export class TSAssemblyWriter {
 
         this.writer.write("(")
 
-        if (node.opcode.definition.mnemonic === "BLKDROP2") {
-            this.writer.write("[")
-        }
-
         node.arguments.forEach((arg, index) => {
             switch (arg.type) {
                 case "stack_entry": {
@@ -264,10 +260,6 @@ export class TSAssemblyWriter {
         })
 
         this.writer.trim()
-
-        if (node.opcode.definition.mnemonic === "BLKDROP2") {
-            this.writer.write("]")
-        }
 
         this.writer.write("),")
 

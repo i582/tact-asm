@@ -153,12 +153,7 @@ const TESTS: TestCase[] = [
                             i.CTOS(),
                             i.LDI(1),
                             i.SWAP(),
-                            i.PUSHCONT_SHORT([
-                                i.LDU(32),
-                                i.LDU(32),
-                                i.ROTREV(),
-                                i.BLKDROP2([1, 2]),
-                            ]),
+                            i.PUSHCONT_SHORT([i.LDU(32), i.LDU(32), i.ROTREV(), i.BLKDROP2(1, 2)]),
                             i.PUSHCONT_SHORT([
                                 i.PUSHINT_16(257),
                                 i.LDIX(),
@@ -187,7 +182,7 @@ const TESTS: TestCase[] = [
                                 i.LDU(64),
                                 i.LDU(32),
                                 i.ROTREV(),
-                                i.BLKDROP2([2, 1]),
+                                i.BLKDROP2(2, 1),
                                 i.XCHG_1([1, 2]),
                                 i.ADD(),
                                 i.NEWC(),
@@ -232,12 +227,7 @@ const TESTS: TestCase[] = [
                             i.CTOS(),
                             i.LDI(1),
                             i.SWAP(),
-                            i.PUSHCONT_SHORT([
-                                i.LDU(32),
-                                i.LDU(32),
-                                i.ROTREV(),
-                                i.BLKDROP2([1, 2]),
-                            ]),
+                            i.PUSHCONT_SHORT([i.LDU(32), i.LDU(32), i.ROTREV(), i.BLKDROP2(1, 2)]),
                             i.PUSHCONT_SHORT([
                                 i.PUSHINT_16(257),
                                 i.LDIX(),
@@ -248,7 +238,7 @@ const TESTS: TestCase[] = [
                             ]),
                             i.IFELSE(),
                             i.CALLREF([i.PUSH(0)]),
-                            i.BLKDROP2([2, 1]),
+                            i.BLKDROP2(2, 1),
                         ],
                     ],
                     [
@@ -258,12 +248,7 @@ const TESTS: TestCase[] = [
                             i.CTOS(),
                             i.LDI(1),
                             i.SWAP(),
-                            i.PUSHCONT_SHORT([
-                                i.LDU(32),
-                                i.LDU(32),
-                                i.ROTREV(),
-                                i.BLKDROP2([1, 2]),
-                            ]),
+                            i.PUSHCONT_SHORT([i.LDU(32), i.LDU(32), i.ROTREV(), i.BLKDROP2(1, 2)]),
                             i.PUSHCONT_SHORT([
                                 i.PUSHINT_16(257),
                                 i.LDIX(),
@@ -274,7 +259,7 @@ const TESTS: TestCase[] = [
                             ]),
                             i.IFELSE(),
                             i.CALLREF([i.PUSH(1)]),
-                            i.BLKDROP2([2, 1]),
+                            i.BLKDROP2(2, 1),
                         ],
                     ],
                 ]),

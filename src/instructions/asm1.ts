@@ -1,8 +1,6 @@
 import {BitReader, Builder, Slice} from "@ton/core";
 import * as $ from "@tonstudio/parser-runtime";
 import { entries, enumObject } from "../utils/tricks";
-import {THROW_SHORT} from "./complex-instructions"
-import {THROWIFNOT_SHORT, XCHG_LONG} from "./instr-gen"
 
 export type Ty<T> = {
     baseLen: number;
@@ -14,7 +12,7 @@ export type Ty<T> = {
     print: (t: T) => string;
 }
 
-const noArgs: Ty<[]> = {
+export const noArgs: Ty<[]> = {
     baseLen: 0,
     store: (_t, _b) => {},
     load: (_s) => [],
@@ -379,7 +377,7 @@ export const xchgArgs: Ty<[number, number]> = {
     tsTypes: () => ["xchgArgs"],
 };
 
-type Opcode<T> = {
+export type Opcode<T> = {
     min: number;
     max: number;
     checkLen: number;
@@ -389,7 +387,7 @@ type Opcode<T> = {
     cat: string;
     version: undefined | number;
     args: Ty<T>;
-    kind: "simple" | "fixed-range" | "other"
+    kind: "simple" | "fixed" | "fixed-range" | "other"
     prefix: number,
     argsString: string,
 }
@@ -466,7 +464,7 @@ const mkfixedn = <T>(
         exec,
         cat: '',
         version: undefined,
-        kind: "simple",
+        kind: "fixed",
         prefix: opcode,
         argsString,
     };
@@ -556,7 +554,7 @@ const mkextrange = <T>(
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const instructions = {
+export const instructions = {
     PUSHNAN: cat('int_const', mksimple(0x83ff, 16, `exec_push_nan`)),
     ADD: cat('add_mul', mksimple(0xa0, 8, `(_1) => exec_add(_1, false)`)),
     SUB: cat('add_mul', mksimple(0xa1, 8, `(_1) => exec_sub(_1, false)`)),
@@ -1496,7 +1494,7 @@ const instructions = {
     PUSHSLICE_REFS_3: cat('cell_const', mkext(3, 0x8c8 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
     PUSHSLICE_REFS_4: cat('cell_const', mkext(4, 0x8cc >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
 
-    PUSHSLICE_LONG_0: cat('cell_const', mkext(0, 0x8d0 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+    PUSHSLICE_LONG: cat('cell_const', mkext(0, 0x8d0 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
     PUSHSLICE_LONG_1: cat('cell_const', mkext(1, 0x8d2 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
     PUSHSLICE_LONG_2: cat('cell_const', mkext(2, 0x8d4 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
     PUSHSLICE_LONG_3: cat('cell_const', mkext(3, 0x8d6 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
@@ -1517,52 +1515,8 @@ const instructions = {
     // 0..239
     SETCP: cat('codepage', mkfixedrangen(0xff00, 0xfff0, 16, 8, seq1(uint(8)), "seq1(uint(8))", `exec_set_cp`)),
     // -15..-1
-    SETCP_1: cat('codepage', mkfixedrangen(0xfff1, 0x10000, 16, 8, seq1(delta(-256, uint(8))), "seq1(delta(-256, uint(8)))", `exec_set_cp`)),
+    SETCP_SHORT: cat('codepage', mkfixedrangen(0xfff1, 0x10000, 16, 8, seq1(delta(-256, uint(8))), "seq1(delta(-256, uint(8)))", `exec_set_cp`)),
 };
-
-
-// Object.entries(instructions).map((entry) => {
-//     const name = entry[0]
-//     const descr = entry[1]
-//     const realName = name.startsWith("2") ? name.slice(1) + "2" : name;
-//     const realRealName = realName.replace("#", "_");
-//
-//     const argTypes = descr.args.tsTypes();
-//     if (descr.kind === "fixed-range") {
-//         if (argTypes.length === 1) {
-//             console.log(`export const ${realRealName} = createFixedRangeInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${descr.skipLen - descr.checkLen}, ${argTypes[0]})`)
-//             return
-//         }
-//
-//         console.log(`export const ${realRealName} = createFixedRangeInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${descr.skipLen - descr.checkLen}, ${descr.argsString})`)
-//         return
-//     }
-//
-//     if (descr.kind !== "simple") return
-//     if (descr.args !== noArgs) {
-//         if (argTypes.length === 1) {
-//             console.log(`export const ${realRealName} = createUnaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]})`)
-//             return
-//         }
-//         if (argTypes.length === 2) {
-//             console.log(`export const ${realRealName} = createBinaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]}, ${argTypes[1]})`)
-//             return
-//         }
-//         if (argTypes.length === 3) {
-//             console.log(`export const ${realRealName} = createTernaryInstr(0x${descr.prefix.toString(16)}, ${descr.checkLen}, ${argTypes[0]}, ${argTypes[1]}, ${argTypes[2]})`)
-//             return
-//         }
-//         return
-//     }
-//     console.log(`export const ${realRealName} = () => createSimpleInstr("${name}", 0x${descr.prefix.toString(16)}, ${descr.checkLen});`)
-// })
-
-
-
-
-
-
-
 
 //
 //

@@ -1,6 +1,6 @@
 import {compileCell, createRefInstr, Instr} from "./instr"
 import {beginCell, Builder, Cell, Dictionary, DictionaryValue, Slice} from "@ton/core"
-import {largeInt, slice, uint} from "./asm1"
+import {largeInt, uint} from "./asm1"
 
 export type EPS = Instr
 
@@ -176,10 +176,53 @@ export const PUSHSLICE = (slice: Slice) => {
             if (realLength - length > 0) {
                 b.storeUint(0x0, realLength - length)
             }
+        },
+    }
+}
 
-            // for (const ref of cell.refs) {
-            //     b.storeRef(ref)
-            // }
+export const PUSHSLICE_LONG = (slice: Slice) => {
+    return {
+        // PUSHSLICE: cat('cell_const', mkext(0, 0x8b,        8, 4, slice(uint(4), 4), `exec_push_slice`)),
+        // PUSHSLICE_REFS_1: cat('cell_const', mkext(1, 0x8c0 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+        // PUSHSLICE_REFS_2: cat('cell_const', mkext(2, 0x8c4 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+        // PUSHSLICE_REFS_3: cat('cell_const', mkext(3, 0x8c8 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+        // PUSHSLICE_REFS_4: cat('cell_const', mkext(4, 0x8cc >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
+
+        // PUSHSLICE_LONG_0: cat('cell_const', mkext(0, 0x8d0 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+        // PUSHSLICE_LONG_1: cat('cell_const', mkext(1, 0x8d2 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+        // PUSHSLICE_LONG_2: cat('cell_const', mkext(2, 0x8d4 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+        // PUSHSLICE_LONG_3: cat('cell_const', mkext(3, 0x8d6 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+        // PUSHSLICE_LONG_4: cat('cell_const', mkext(4, 0x8d8 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
+
+        store: (b: Builder) => {
+            const refs = slice.remainingRefs
+
+            if (refs === 0) {
+                b.storeUint(0x8d0 >> 1, 11)
+            } else if (refs === 1) {
+                b.storeUint(0x8d2 >> 1, 11)
+            } else if (refs === 2) {
+                b.storeUint(0x8d4 >> 1, 11)
+            } else if (refs === 3) {
+                b.storeUint(0x8d6 >> 1, 11)
+            } else if (refs === 4) {
+                b.storeUint(0x8d8 >> 1, 11)
+            } else {
+                throw new Error("too many refs")
+            }
+
+            const length = slice.remainingBits + 1
+            const y = Math.ceil((length - 6) / 8)
+            b.storeUint(y, 7)
+
+            b.storeSlice(slice)
+
+            b.storeUint(0x1, 1)
+
+            const realLength = y * 8 + 6
+            if (realLength - length > 0) {
+                b.storeUint(0x0, realLength - length)
+            }
         },
     }
 }
@@ -319,7 +362,16 @@ export const STSLICECONST = (slice: Slice): Instr => {
         store: (b: Builder) => {
             // 0xCFC0_ 6_
 
-            b.storeUint(0xcf80 >> 7, 9)
+            const refs = slice.remainingRefs
+            if (refs === 0) {
+                b.storeUint(0xcf8 >> 1, 11)
+            } else if (refs === 1) {
+                b.storeUint(0xcfa >> 1, 11)
+            } else if (refs === 2) {
+                b.storeUint(0xcfc >> 1, 11)
+            } else if (refs === 3) {
+                b.storeUint(0xcfe >> 1, 11)
+            }
 
             // 11010011110010001100111110001 000010000000000 1000 11001111001100011111001011110000
             // 11010011110010001100111110001 000010000000000 0000 11001111001100011111001011110000
@@ -356,7 +408,6 @@ export const STSLICECONST = (slice: Slice): Instr => {
             const length = slice.remainingBits + 1
 
             const y = Math.ceil((length - 2) / 8)
-            b.storeUint(0, 2)
             b.storeUint(y, 3)
 
             b.storeSlice(slice)

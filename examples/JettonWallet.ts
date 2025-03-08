@@ -28,7 +28,7 @@ export const instructions = [
         i.LDMSGADDR(),                            // 0xFA40
         i.LDMSGADDR(),                            // 0xFA40
         i.BLKSWAP(3 , 1),                         // 0x55 2 0
-        i.BLKDROP2([1 , 3]),                      // 0x6C 1 3
+        i.BLKDROP2(1 , 3),                      // 0x6C 1 3
         i.XCHG_0(4),                              // 0x0 4
         i.IFJMPREF([
           i.XCHG_0(2),                            // 0x0 2
@@ -52,7 +52,7 @@ export const instructions = [
             i.LDU(64),                            // 0xD3 3F
             i.LDGRAMS(),                          // 0xFA00
             i.ROTREV(),                           // 0x59
-            i.BLKDROP2([2 , 1]),                  // 0x6C 2 1
+            i.BLKDROP2(2 , 1),                  // 0x6C 2 1
             i.ADD(),                              // 0xA0
             i.XCHG_0(2),                          // 0x0 2
             i.NEWC(),                             // 0xC8
@@ -73,7 +73,7 @@ export const instructions = [
             i.LDU(64),                            // 0xD3 3F
             i.LDGRAMS(),                          // 0xFA00
             i.ROTREV(),                           // 0x59
-            i.BLKDROP2([2 , 1]),                  // 0x6C 2 1
+            i.BLKDROP2(2 , 1),                  // 0x6C 2 1
             i.ADD(),                              // 0xA0
             i.XCHG_0(2),                          // 0x0 2
             i.NEWC(),                             // 0xC8
@@ -169,7 +169,7 @@ export const instructions = [
                         i.LDGRAMS(),                            // 0xFA00
                         i.LDGRAMS(),                            // 0xFA00
                         i.POP(0),                               // 0x3 0
-                        i.BLKDROP2([6 , 1]),                    // 0x6C 6 1
+                        i.BLKDROP2(6 , 1),                    // 0x6C 6 1
                         i.PUSHINT(0),                           // 0x7 0
                         i.GETORIGINALFWDFEE(),                  // 0xF83A
                         i.MUL(),                                // 0xA8
@@ -235,7 +235,7 @@ export const instructions = [
                             i.XCHG_1([4, 5]),                     // 0x10 4 5
                             i.XCHG_1([2, 4]),                     // 0x10 2 4
                             i.XCHG_1([2, 3]),                     // 0x10 2 3
-                            i.BLKPUSH([4, 1]),                     // 0x5F 4 1
+                            i.BLKPUSH(4, 1),                     // 0x5F 4 1
                             i.HASHCU(),                           // 0xF900
                             i.SWAP(),                             // 0x0 1
                             i.HASHCU(),                           // 0xF900
@@ -389,7 +389,7 @@ export const instructions = [
                             i.LDGRAMS(),                        // 0xFA00
                             i.LDGRAMS(),                        // 0xFA00
                             i.POP(0),                           // 0x3 0
-                            i.BLKDROP2([6 , 1]),                // 0x6C 6 1
+                            i.BLKDROP2(6 , 1),                // 0x6C 6 1
                             i.PUSHINT(0),                       // 0x7 0
                             i.GETORIGINALFWDFEE(),              // 0xF83A
                             i.PUXC(8 , -1),                     // 0x52 8 0
@@ -457,7 +457,7 @@ export const instructions = [
                             i.IFELSE(),                           // 0xE2
                             i.PUSHREF([
                                 i.PUSHCONT([
-                                    i.BLKDROP2([3, 1]),                // 0x6C 3 1
+                                    i.BLKDROP2(3, 1),                // 0x6C 3 1
                                 ]),                                   // 0x9 6C31
                                 i.IFREFELSE([
                                     i.PUSHINT(2),                       // 0x7 2
@@ -547,7 +547,7 @@ export const instructions = [
                     i.LDGRAMS(),                          // 0xFA00
                     i.LDGRAMS(),                          // 0xFA00
                     i.POP(0),                             // 0x3 0
-                    i.BLKDROP2([6 , 1]),                  // 0x6C 6 1
+                    i.BLKDROP2(6 , 1),                  // 0x6C 6 1
                     i.PUSHINT(0),                         // 0x7 0
                     i.GETORIGINALFWDFEE(),                // 0xF83A
                     i.PUSHINT_LONG(30000000n),                // 0x82 09C9C380
@@ -621,11 +621,11 @@ export const instructions = [
       i.LDMSGADDR(),                              // 0xFA40
       i.LDMSGADDR(),                              // 0xFA40
       i.BLKSWAP(3 , 1),                           // 0x55 2 0
-      i.BLKDROP2([1 , 3]),                        // 0x6C 1 3
+      i.BLKDROP2(1 , 3),                        // 0x6C 1 3
       i.GETPARAM(10),                             // 0xF82 A
       i.PU2XC(3 , 2 , -2),                        // 0x546 3 3 0
       i.PUXC(3 , -1),                             // 0x52 3 0
-      i.BLKDROP2([3 , 4]),                        // 0x6C 3 4
+      i.BLKDROP2(3 , 4),                        // 0x6C 3 4
     ]],
   ])),
   i.DICTIGETJMPZ(),

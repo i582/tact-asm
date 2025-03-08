@@ -12,6 +12,7 @@ import {
     MUL,
     PUSHSLICE,
     hex,
+    PUSHSLICE_LONG,
 } from "../instructions"
 import {AssemblyWriter, disassembleRoot} from "@tact-lang/opcode"
 import {call, execute} from "../instructions/helpers"
@@ -164,14 +165,30 @@ PROGRAM{
 PROGRAM{
   DECLPROC recv_internal
   recv_internal PROC:<{
-    1 PUSHINT
-    2 PUSHINT
-    3 PUSHINT
-    <{
-      MUL
-      ADD
-    }> PUSHCONT
-    EXECUTE
+    x{6_} PUSHSLICE
+  }>
+}END>c`,
+    },
+    {
+        name: "PUSHSLICE_LONG",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        PUSHSLICE_LONG(hex("6_")),
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        expected: `"Asm.fif" include
+PROGRAM{
+  DECLPROC recv_internal
+  recv_internal PROC:<{
+    x{6_} PUSHSLICE
   }>
 }END>c`,
     },

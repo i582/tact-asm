@@ -2,13 +2,11 @@ import {Builder, Cell, BitBuilder, Slice} from "@ton/core"
 import {Ty} from "./asm1"
 
 export type Instr = {
-    name?: string
     store: (b: Builder) => void
 }
 
-export const createSimpleInstr = (name: string, prefix: number, prefixLength: number): Instr => {
+export const createSimpleInstr = (prefix: number, prefixLength: number): Instr => {
     return {
-        name,
         store: (b: Builder) => {
             b.storeUint(prefix, prefixLength)
         },
@@ -48,6 +46,24 @@ export const createFixedRangeInstr = <T>(
             store: (b: Builder) => {
                 b.storeUint(prefix >> shiftLength, prefixLength)
                 serializer.store(arg, b)
+            },
+        }
+    }
+}
+
+export const createBinaryFixedRangeInstr = <T>(
+    prefix: number,
+    prefixLength: number,
+    shiftLength: number,
+    serializer1: Ty<T>,
+    serializer2: Ty<T>,
+): ((arg1: T, arg2: T) => Instr) => {
+    return (arg1, arg2) => {
+        return {
+            store: (b: Builder) => {
+                b.storeUint(prefix >> shiftLength, prefixLength)
+                serializer1.store(arg1, b)
+                serializer2.store(arg2, b)
             },
         }
     }
@@ -95,7 +111,6 @@ export const createRefInstr = (
 ): ((instructions: Instr[]) => Instr) => {
     return instructions => {
         return {
-            name: "PUSHREF",
             store: (b: Builder) => {
                 b.storeUint(prefix, prefixLength)
                 b.storeRef(compileCell(instructions))

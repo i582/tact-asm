@@ -1,7 +1,7 @@
 import {Instr} from "./instr"
 import {Builder} from "@ton/core"
 import {PUSHCONT} from "./complex-instructions"
-import {EXECUTE} from "./instr-gen"
+import {EXECUTE} from "./instr.gen"
 
 export const call = (what: Instr, args: Instr[]): Instr => {
     return {

@@ -18,6 +18,7 @@ import {
     SDBEGINS,
     PUSHSLICE,
     hex,
+    PUSHSLICE_LONG,
 } from "../instructions"
 import {beginCell, Cell} from "@ton/core"
 import {compileFunc} from "@ton-community/func-js"
@@ -203,6 +204,33 @@ const TESTS: TestCase[] = [
         ],
         funcCode: `
             slice push_slice() asm "x{6_} PUSHSLICE";
+            int bits(slice where) asm "SBITS";
+        
+            () recv_internal() impure {
+                throw(push_slice().bits());
+            }`,
+    },
+
+    {
+        name: "PUSHSLICE_LONG",
+        instructions: [
+            SETCP(0),
+            PUSHDICTCONST(
+                new Map([
+                    // prettier-ignore
+                    [0, [
+                        PUSHSLICE_LONG(hex("BEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEF")),
+                        SBITS(),
+                        THROWANY(),
+                    ]],
+                ]),
+            ),
+            DICTIGETJMPZ(),
+            THROWARG(11),
+        ],
+        funcCode: `
+            ;; 800 bits, too many for ordinary PUSHSLICE
+            slice push_slice() asm "x{BEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEFBEEF} PUSHSLICE";
             int bits(slice where) asm "SBITS";
         
             () recv_internal() impure {

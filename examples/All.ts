@@ -1,5 +1,4 @@
 import * as i from "../src/instructions"
-import {Hash} from "../src/instructions/asm1"
 
 export const instructions = [
     i.XCHG_0,
