@@ -1,5 +1,15 @@
 import {Cell} from "@ton/core"
 
+export function hexToBin(hex: string): string {
+    hex = hex.replace("0x", "")
+
+    let bin = ""
+    for (let i = 0; i < hex.length; i++) {
+        bin += parseInt(hex[i], 16).toString(2).padStart(4, "0")
+    }
+    return bin
+}
+
 export function visualizeBoc(cell: Cell, name: string) {
     process.stdout.write(name)
 

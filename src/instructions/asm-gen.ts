@@ -82,7 +82,6 @@ function processInstr(entry: [string, Opcode<unknown>]) {
 
     if (descr.kind === "other") {
         const name = entry[0]
-        // const descr = entry[1]
 
         if (name.includes("PUSHSLICE_REFS")) {
             // handled in PUSHSLICE

@@ -1009,7 +1009,7 @@ export const instructions = {
     MULADDRSHIFTMOD: version(4, cat('div', mksimple(0xa9a0, 16, `exec_mulshrmod(_1, _2, 0)`))),
     MULADDRSHIFTRMOD: version(4, cat('div', mksimple(0xa9a1, 16, `exec_mulshrmod(_1, _2, 0)`))),
     MULADDRSHIFTCMOD: version(4, cat('div', mksimple(0xa9a2, 16, `exec_mulshrmod(_1, _2, 0)`))),
-    MULRSHIFT: cat('div', mksimple(0xa9a4, 16, `exec_mulshrmod(_1, _2, 0)`)),
+    MULRSHIFT: cat('div', mksimple(0xa9b4, 16, `exec_mulshrmod(_1, _2, 0)`)),
     MULRSHIFTR: cat('div', mksimple(0xa9a5, 16, `exec_mulshrmod(_1, _2, 0)`)),
     MULRSHIFTC: cat('div', mksimple(0xa9a6, 16, `exec_mulshrmod(_1, _2, 0)`)),
     MULMODPOW2: cat('div', mksimple(0xa9a8, 16, `exec_mulshrmod(_1, _2, 0)`)),

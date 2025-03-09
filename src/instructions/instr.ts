@@ -3,6 +3,7 @@ import {Ty} from "./asm1"
 
 export type Instr = {
     store: (b: Builder) => void
+    print?: () => string[]
 }
 
 export const createSimpleInstr = (prefix: number, prefixLength: number): Instr => {
@@ -21,14 +22,7 @@ export const createUnaryInstr = <T>(
     return arg => {
         return {
             store: (b: Builder) => {
-                try {
-                    b.storeUint(prefix, prefixLength)
-                } catch (e) {
-                    // @ts-ignore
-                    const bits = b._bits as BitBuilder
-                    console.log(bits.buffer().toString("hex"))
-                    throw e
-                }
+                b.storeUint(prefix, prefixLength)
                 serializer.store(arg, b)
             },
         }
@@ -92,12 +86,12 @@ export const createTernaryInstr = <T1, T2, T3>(
     serializer1: Ty<T1>,
     serializer2: Ty<T2>,
     serializer3: Ty<T3>,
-): ((arg: T1, arg2: T2, arg3: T3) => Instr) => {
-    return (arg, arg2, arg3) => {
+): ((arg1: T1, arg2: T2, arg3: T3) => Instr) => {
+    return (arg1, arg2, arg3) => {
         return {
             store: (b: Builder) => {
                 b.storeUint(prefix, prefixLength)
-                serializer1.store(arg, b)
+                serializer1.store(arg1, b)
                 serializer2.store(arg2, b)
                 serializer3.store(arg3, b)
             },

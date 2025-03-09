@@ -7,6 +7,9 @@ export type EPS = Instr
 export const EPS = (): EPS => {
     return {
         store: (_: Builder) => {},
+        print: () => {
+            return []
+        },
     }
 }
 
@@ -16,13 +19,13 @@ export const THROW_SHORT = (arg: number): Instr => {
             b.storeUint(0xf20 | (arg >> 4), 12)
             b.storeUint(arg & 15, 4)
         },
+        print: () => [`THROW_SHORT(${arg})`],
     }
 }
 
 export const XCHG_0 = (arg: number) => {
     return {
         store: (b: Builder) => {
-            // b.storeUint(0x02, 8)
             b.storeUint(arg & 15, 8)
         },
     }
@@ -187,12 +190,6 @@ export const PUSHSLICE = (slice: Slice) => {
 
 export const PUSHSLICE_LONG = (slice: Slice) => {
     return {
-        // PUSHSLICE: cat('cell_const', mkext(0, 0x8b,        8, 4, slice(uint(4), 4), `exec_push_slice`)),
-        // PUSHSLICE_REFS_1: cat('cell_const', mkext(1, 0x8c0 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-        // PUSHSLICE_REFS_2: cat('cell_const', mkext(2, 0x8c4 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-        // PUSHSLICE_REFS_3: cat('cell_const', mkext(3, 0x8c8 >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-        // PUSHSLICE_REFS_4: cat('cell_const', mkext(4, 0x8cc >> 2, 10, 5, slice(uint(5), 1), `exec_push_slice_r`)),
-
         // PUSHSLICE_LONG_0: cat('cell_const', mkext(0, 0x8d0 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
         // PUSHSLICE_LONG_1: cat('cell_const', mkext(1, 0x8d2 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
         // PUSHSLICE_LONG_2: cat('cell_const', mkext(2, 0x8d4 >> 1, 11, 7, slice(uint(7), 6), `exec_push_slice_r2`)),
@@ -259,6 +256,15 @@ export const PSEUDO_PUSHREF = (instructions: Instr[]) => {
         name: "PSEUDO_PUSHREF",
         store: (b: Builder) => {
             b.storeRef(compileCell(instructions))
+        },
+    }
+}
+
+export const PUSHREFSLICE_CONST = (slice: Slice) => {
+    return {
+        store: (b: Builder) => {
+            b.storeUint(0x88, 8)
+            b.storeRef(slice.asCell())
         },
     }
 }
