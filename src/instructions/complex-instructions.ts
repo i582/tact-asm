@@ -69,15 +69,13 @@ export const PUSHDICTCONST = (keyLength: number, mapping: Map<number, Instr[]>):
     }
 }
 
-export const DICTPUSHCONST = (slice: Slice, num: number): Instr => {
+export const DICTPUSHCONST = (slice: Slice, keyLength: number): Instr => {
     return {
         store: (b: Builder) => {
-            b.storeUint(0xf4a400 >> 11, 13) // 0b1111010010100110
+            b.storeUint(0xf4a400 >> 11, 13)
             b.storeUint(1, 1)
-
             b.storeRef(slice.asCell())
-
-            b.storeUint(num, 10)
+            b.storeUint(keyLength, 10)
         },
     }
 }

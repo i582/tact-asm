@@ -19,7 +19,7 @@
         "noImplicitOverride": true,
         "noImplicitReturns": true,
         "noPropertyAccessFromIndexSignature": true,
-        "noUnusedParameters": true
+        "noUnusedParameters": false
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]
