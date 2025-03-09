@@ -50,7 +50,7 @@ console.log("equal")
         console.log(index + `\r`)
     } catch (e) {
         fs.appendFileSync(
-            `${__dirname}/testing/_errors.txt`,
+            `${__dirname}/../src/testing/_errors.txt`,
             // @ts-ignore
             index.toString() + ": " + e.toString() + "\n\n",
         )
