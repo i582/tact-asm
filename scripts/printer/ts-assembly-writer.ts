@@ -56,7 +56,7 @@ export class TSAssemblyWriter {
         this.writer.indent(() => {
             node.topLevelInstructions.forEach(it => {
                 if (it.opcode.definition.mnemonic === "DICTPUSHCONST") {
-                    this.writer.writeLine("i.PUSHDICTCONST(new Map([")
+                    this.writer.writeLine("i.PUSHDICTCONST(19, new Map([")
                     this.writer.indent(() => {
                         methods.forEach(method => {
                             this.writeMethodNode(method)

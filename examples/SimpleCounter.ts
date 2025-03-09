@@ -105,7 +105,7 @@ export const instructions = [
       ]),
   ]),
   i.IFNOTJMP(),
-  i.PUSHDICTCONST(new Map([
+  i.PUSHDICTCONST(19, new Map([
     [104984, [
       i.PUSHCTR(4),                               // 0xED4 4
       i.CTOS(),                                   // 0xD0

@@ -50,6 +50,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -78,6 +79,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -107,6 +109,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -130,6 +133,7 @@ const TESTS: TestCase[] = [
         instructions: [
             i.SETCP(0),
             i.PUSHDICTCONST(
+                19,
                 new Map([
                     [
                         0,
@@ -280,7 +284,7 @@ describe("tests", () => {
     TESTS.forEach(({name, methodId, instructions, prepareData, compareResult}: TestCase) => {
         it(`Test ${name}`, async () => {
             const blockchain: Blockchain = await Blockchain.create()
-            blockchain.verbosity.vmLogs = "vm_logs_verbose"
+            // blockchain.verbosity.vmLogs = "vm_logs_verbose"
             const treasure: SandboxContract<TreasuryContract> = await blockchain.treasury(name)
 
             const init: StateInit = {

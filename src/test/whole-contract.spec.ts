@@ -22,7 +22,7 @@ import {instructions as simpleCounterInstructions} from "./testdata/test_SimpleC
 describe("whole-contract-tests", () => {
     it(`Test simple counter`, async () => {
         const blockchain: Blockchain = await Blockchain.create()
-        blockchain.verbosity.vmLogs = "vm_logs_verbose"
+        // blockchain.verbosity.vmLogs = "vm_logs_verbose"
         const treasure: SandboxContract<TreasuryContract> = await blockchain.treasury("treasure")
 
         const init: StateInit = {

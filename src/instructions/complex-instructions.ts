@@ -31,7 +31,7 @@ export const XCHG_0 = (arg: number) => {
     }
 }
 
-export const PUSHDICTCONST = (mapping: Map<number, Instr[]>): Instr => {
+export const PUSHDICTCONST = (keyLength: number, mapping: Map<number, Instr[]>): Instr => {
     function createCodeCell(): DictionaryValue<Cell> {
         return {
             serialize: (src, builder) => {
@@ -49,7 +49,10 @@ export const PUSHDICTCONST = (mapping: Map<number, Instr[]>): Instr => {
 
     return {
         store: (b: Builder) => {
-            const dict = Dictionary.empty<number, Cell>(Dictionary.Keys.Int(19), createCodeCell())
+            const dict = Dictionary.empty<number, Cell>(
+                Dictionary.Keys.Int(keyLength),
+                createCodeCell(),
+            )
             mapping.entries().forEach(entry => {
                 const [id, instructions] = entry
                 const cell = compileCell(instructions)
@@ -61,7 +64,7 @@ export const PUSHDICTCONST = (mapping: Map<number, Instr[]>): Instr => {
 
             b.storeRef(beginCell().storeDictDirect(dict).endCell())
 
-            b.storeUint(19, 10)
+            b.storeUint(keyLength, 10)
         },
     }
 }
@@ -263,7 +266,7 @@ export const PSEUDO_PUSHREF = (instructions: Instr[]) => {
 export const PUSHREFSLICE_CONST = (slice: Slice) => {
     return {
         store: (b: Builder) => {
-            b.storeUint(0x88, 8)
+            b.storeUint(0x89, 8)
             b.storeRef(slice.asCell())
         },
     }

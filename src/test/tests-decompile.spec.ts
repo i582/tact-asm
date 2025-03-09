@@ -31,6 +31,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -62,6 +63,7 @@ PROGRAM{
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -94,6 +96,7 @@ PROGRAM{
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -120,6 +123,7 @@ PROGRAM{
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -151,6 +155,7 @@ PROGRAM{
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -174,6 +179,7 @@ PROGRAM{
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [

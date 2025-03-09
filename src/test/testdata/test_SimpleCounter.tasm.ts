@@ -86,6 +86,7 @@ export const instructions = [
     i.IFNOTJMP(),
     i.PSEUDO_PUSHREF([
         i.PUSHDICTCONST(
+            19,
             new Map([
                 [
                     65536,

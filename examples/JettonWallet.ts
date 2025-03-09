@@ -4,7 +4,7 @@ import {Hash} from "../src/instructions/asm1";
 
 export const instructions = [
   i.SETCP(0),
-  i.PUSHDICTCONST(new Map([
+  i.PUSHDICTCONST(19, new Map([
     [0, [
       i.POP(0),                                   // 0x3 0
       i.PUSHREF([

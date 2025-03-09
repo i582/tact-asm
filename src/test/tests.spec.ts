@@ -36,6 +36,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -91,6 +92,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -113,6 +115,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 // prettier-ignore
                 new Map([[0, [
                     PUSHCONT_SHORT([
@@ -141,6 +144,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 // prettier-ignore
                 new Map([[0, [
                     SDBEGINSX(),
@@ -165,6 +169,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 // prettier-ignore
                 new Map([[0, [
                     SDBEGINS(beginCell().storeUint(0n, 4).asSlice()),
@@ -190,6 +195,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [
@@ -216,6 +222,7 @@ const TESTS: TestCase[] = [
         instructions: [
             SETCP(0),
             PUSHDICTCONST(
+                19,
                 new Map([
                     // prettier-ignore
                     [0, [

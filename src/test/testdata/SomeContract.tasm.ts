@@ -3,6 +3,7 @@ import * as i from "../../instructions"
 export const instructions = [
     i.SETCP(0),
     i.PUSHDICTCONST(
+        19,
         new Map([
             [
                 0,
