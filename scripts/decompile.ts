@@ -1,5 +1,4 @@
-import {disassembleRoot} from "@tact-lang/opcode"
-import {TSAssemblyWriter} from "./printer/ts-assembly-writer"
+import {disassembleRoot, AssemblyWriter} from "opcode"
 import {Cell} from "@ton/core"
 
 // Simple counter
@@ -11,4 +10,4 @@ const cell = Cell.fromBase64(
 
 const ast = disassembleRoot(cell, {computeRefs: false})
 
-console.log(TSAssemblyWriter.write(ast, {}))
+console.log(AssemblyWriter.write(ast, {}))
