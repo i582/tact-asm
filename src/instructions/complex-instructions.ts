@@ -1,6 +1,6 @@
 import {compileCell, createRefInstr, Instr} from "./instr"
 import {beginCell, Builder, Cell, Dictionary, DictionaryValue, Slice} from "@ton/core"
-import {largeInt, uint} from "./asm1"
+import {largeInt, uint} from "./asm"
 
 export type EPS = Instr
 

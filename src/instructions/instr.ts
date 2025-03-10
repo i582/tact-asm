@@ -1,5 +1,5 @@
 import {Builder, Cell, BitBuilder, Slice} from "@ton/core"
-import {Ty} from "./asm1"
+import {Ty} from "./asm"
 
 export type Instr = {
     store: (b: Builder) => void

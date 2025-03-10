@@ -19,7 +19,7 @@ import {
     stack,
     control,
     s1,
-} from "./asm1"
+} from "./asm"
 
 //#region Simple instructions, 684
 export const PUSHNAN = () => createSimpleInstr(0x83ff, 16)

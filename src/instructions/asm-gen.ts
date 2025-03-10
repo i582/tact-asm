@@ -1,4 +1,4 @@
-import {instructions, noArgs, Opcode} from "./asm1"
+import {instructions, noArgs, Opcode} from "./asm"
 import * as fs from "node:fs"
 
 const lines: string[] = []
@@ -164,7 +164,7 @@ import {
     stack,
     control,
     s1,
-} from "./asm1"
+} from "./asm"
 
 `
 

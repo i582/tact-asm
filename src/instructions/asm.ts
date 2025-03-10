@@ -78,7 +78,6 @@ export const delta = (n: number, ty: Ty<number>): Ty<number> => ({
     tsTypes: () => [`delta(${n}, ${ty.tsTypes().join(", ")})`],
 })
 
-
 export const stack = (bits: number): Ty<number> => {
     const ui = uint(bits);
     return {
@@ -91,7 +90,9 @@ export const stack = (bits: number): Ty<number> => {
         tsTypes: () => [ui.print(bits)],
     };
 };
+
 const uint4 = uint(4);
+
 export const control: Ty<number> = {
     store: (t, b) => {
         if (t === 6) {
@@ -112,6 +113,7 @@ export const control: Ty<number> = {
     print: (n) => 'c' + uint4.print(n),
     tsTypes: () => [`control`],
 };
+
 // special case: XCHG s1 $
 const s1Aux = stack(4);
 export const s1: Ty<number> = {
@@ -127,6 +129,7 @@ export const s1: Ty<number> = {
     print: s1Aux.print,
     tsTypes: () => [`s1`],
 };
+
 // special case: CALLXARGS $ -1
 export const minusOne: Ty<number> = {
     baseLen: 0,
@@ -141,6 +144,7 @@ export const minusOne: Ty<number> = {
     print: uint4.print,
     tsTypes: () => [`minusOne`],
 };
+
 // special case: RUNVM { ... }
 // TODO:
 // +1 = same_c3 (set c3 to code)
@@ -164,11 +168,9 @@ export enum Hash {
 }
 const [hashHead, ...hashTail] = entries(enumObject(Hash))
     .map(([key, value]) => $.app($.str(key), () => value));
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-if (!hashHead) {
-    throw new Error('Impossible');
-}
+
 const uint8 = uint(8);
+
 export const hash: Ty<Hash> = {
     store: (t, b) => { uint8.store(t, b); },
     load: (s) => {
@@ -304,8 +306,6 @@ export const largeInt: Ty<bigint> = ({
         // len = (n - 19) / 8
         const countBits = Math.ceil((len - 19) / 8);
 
-        // 0b1000010001011001101000001100000100010
-
         uint5.store(countBits, b);
         const intCountBits = 8 * countBits + 19
         b.storeInt(t, intCountBits);
@@ -401,26 +401,6 @@ const version = <T>(version: number, o: Opcode<T>): Opcode<T> => {
 };
 
 const max_opcode_bits = 24;
-const top_opcode = 1 << max_opcode_bits;
-
-const dummyName = '<ERROR>' as const;
-const dummy = (
-    min: number,
-    max: number
-): Opcode<[]> => ({
-    min,
-    max,
-    checkLen: 0,
-    skipLen: 0,
-    args: noArgs,
-    exec: '',
-    refs: 0,
-    cat: '',
-    version: undefined,
-    kind: "other",
-    prefix: 0,
-    argsString: "",
-});
 
 const mksimple = (
     opcode: number,
@@ -766,7 +746,7 @@ export const instructions = {
     SAMEALTSAVE: cat('continuation_change', mksimple(0xedfb, 16, `(_1) => exec_samealt(_1, true)`)),
     TRY: cat('exception', mksimple(0xf2ff, 16, `(_1) => exec_try(_1, -1)`)),
     SETCPX: cat('codepage', mksimple(0xfff0, 16, `exec_set_cp_any`)),
-    
+
     STDICT: cat('dictionary', mksimple(0xf400, 16, `exec_store_dict`)),
     SKIPDICT: cat('dictionary', mksimple(0xf401, 16, `exec_skip_dict`)),
     LDDICTS: cat('dictionary', mksimple(0xf402, 16, `(_1) => exec_load_dict_slice(_1, 0)`)),
@@ -1469,7 +1449,7 @@ export const instructions = {
     DEBUG_1: cat('debug', mkfixedrangen(0xfe15, 0xfe20, 16, 8, seq1(uint(8)), "seq1(uint(8))", `exec_dummy_debug`)),
     DUMP: cat('debug', mkfixedn(0xfe2, 12, 4, seq1(stack(4)), "seq1(stack(4))", `exec_dump_value`)),
     DEBUG_2: cat('debug', mkfixedrangen(0xfe30, 0xfef0, 16, 8, seq1(uint(8)), "seq1(uint(8))", `exec_dummy_debug`)),
-    
+
     // PUSH c*
     // PUSH c6 -> ошибка
     // PUSH s*
@@ -1517,96 +1497,3 @@ export const instructions = {
     // -15..-1
     SETCP_SHORT: cat('codepage', mkfixedrangen(0xfff1, 0x10000, 16, 8, seq1(delta(-256, uint(8))), "seq1(delta(-256, uint(8)))", `exec_set_cp`)),
 };
-
-//
-//
-//
-//
-//
-// const sorted = instructions.sort((a, b) => a.min - b.min);
-//
-// type InstructionOrDummy = Opcode<[], typeof dummyName> | (typeof instructions)[number]
-//
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// const instruction_list: InstructionOrDummy[] = [];
-// let upto = 0;
-// for (const instruction of sorted) {
-//     const { min, max } = instruction;
-//     assert(min < max);
-//     assert(min >= upto);
-//     assert(max <= top_opcode);
-//     if (upto < min) {
-//         instruction_list.push(dummy(upto, min));
-//     }
-//     instruction_list.push(instruction);
-//     upto = max;
-// }
-// if (upto < top_opcode) {
-//     instruction_list.push(dummy(upto, top_opcode));
-// }
-//
-// export const dump_instr = (cs: Slice, vmVersion: number, isDebug: boolean) => {
-//     const bits = Math.min(cs.remainingBits, max_opcode_bits);
-//     const opcode = cs.preloadUint(bits) << (max_opcode_bits - bits);
-//
-//     let i = 0;
-//     let j = instruction_list.length;
-//     while (j - i > 1) {
-//         const k = ((j + i) >> 1);
-//         const instr = instruction_list[k];
-//         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-//         if (instr === undefined) {
-//             throw new Error();
-//         }
-//         if (instr.min <= opcode) {
-//             i = k;
-//         } else {
-//             j = k;
-//         }
-//     }
-//
-//     const instr = instruction_list[i];
-//     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-//     if (instr === undefined) {
-//         throw new Error();
-//     }
-//     if (instr.name === dummyName) {
-//         return undefined;
-//     }
-//     if (bits < instr.checkLen) {
-//         return undefined;
-//     }
-//     cs.skip(instr.skipLen);
-//     // TODO: check version against vmVersion
-//     // TODO: check cat against isDebug
-//     const { args, refs, version: _version, cat: _cat } = instr;
-//
-//     const result = args.load(cs);
-//
-//     // return dump(instr, cs, opcode, bits);
-// }
-//
-// // TODO:
-// //  CST
-// //  astToCst
-// //
-//
-// type DumpFormat = {
-//     contracts: { code: string }[];
-// }
-// const json = JSON.parse(readFileSync(join(__dirname, "contracts2.json"), "utf-8")) as DumpFormat;
-// const hex = json.contracts[0]!.code;
-// const cell = Cell.fromBoc(Buffer.from(hex, 'hex'))[0];
-// const slice = cell.beginParse();
-// const opcodes = [];
-// for (;;) {
-//     if (hasInstr()) opcodes.push(decodeInstr()) else if (slice.remainingRefs > 0) slice = slice.loadRef(); else break;
-// }
-// // checkLayout "SETCP", "DICTPUSHCONST", "DICTIGETJMPZ", "THROWARG"
-// const dictOpcode = opcodes[1].op
-// const {procedures, methods} = deserializeDict(dictOpcode.operands, options.computeRefs)
-// const topLevelInstructions = opcodes.map(op => processInstruction(op, {
-//     source: cell,
-//     offset: {bits: 0, refs: 9},
-//     onCellReference: undefined,
-// }))
